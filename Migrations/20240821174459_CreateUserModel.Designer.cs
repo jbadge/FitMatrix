@@ -24,7 +24,7 @@ namespace FitMatrix.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("TacoTuesday.Models.User", b =>
+            modelBuilder.Entity("FitMatrix.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

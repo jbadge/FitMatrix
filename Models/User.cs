@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 
-namespace TacoTuesday.Models
+namespace FitMatrix.Models
 {
     public class User
     {

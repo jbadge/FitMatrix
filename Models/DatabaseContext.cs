@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TacoTuesday.Models;
 
 namespace FitMatrix.Models
 {

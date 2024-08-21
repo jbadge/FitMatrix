@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FitMatrix.Models;
-using TacoTuesday.Models;
-
 
 namespace FitMatrix.Controllers
 {
