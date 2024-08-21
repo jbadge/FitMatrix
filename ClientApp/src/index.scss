@@ -65,6 +65,24 @@ footer {
   // color: red;
 }
 
+input[type='number'] {
+  border: none;
+  border-color: transparent;
+  // BELOW?
+  appearance: textfield;
+  &:focus-visible {
+    outline: none;
+  }
+  margin: 5px 0 0 10px;
+  height: 22px;
+  font-size: 20px;
+}
+
+label {
+  display: block;
+  padding: 5px 0;
+}
+
 @media screen and (max-width: 400px) {
   .log-values {
     position: absolute;
@@ -155,6 +173,7 @@ footer {
       align-items: center;
     }
     .calories-input-container {
+      margin-top: 3rem;
       .calories-input-stats {
         margin-top: 2rem;
       }
@@ -166,9 +185,19 @@ footer {
     .calories-user-stats {
       padding-top: 2rem;
       font-size: 14px;
+      visibility: hidden;
+      opacity: 0;
+      transition:
+        visibility 0s,
+        opacity 0.5s linear;
+      height: auto;
       & > div {
         padding: 1rem;
       }
+    }
+    .calories-user-stats.show {
+      visibility: visible;
+      opacity: 1;
     }
   }
 
