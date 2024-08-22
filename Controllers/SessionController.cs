@@ -54,9 +54,8 @@ namespace FitMatrix.Controllers
                 var response = new
                 {
                     status = 400,
-                    errors = new List<string>() { "User does not exist" }
+                    errors = new List<string>() { foundUser == null ? "User does not exist" : "Wrong Password" }
                 };
-
                 return BadRequest(response);
             }
         }

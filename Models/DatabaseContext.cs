@@ -12,6 +12,9 @@ namespace FitMatrix.Models
         private static bool LOG_SQL_STATEMENTS_IN_DEVELOPMENT = false;
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Stats> Stats { get; set; }
+        public DbSet<Goal> Goal { get; set; }
+        public DbSet<Progress> Progress { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

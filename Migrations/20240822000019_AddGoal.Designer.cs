@@ -3,6 +3,7 @@ using System;
 using FitMatrix.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FitMatrix.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240822000019_AddGoal")]
+    partial class AddGoal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,39 +56,6 @@ namespace FitMatrix.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Goal");
-                });
-
-            modelBuilder.Entity("FitMatrix.Models.Progress", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ActivityLevel")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("DoB")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Height")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Sex")
-                        .HasColumnType("text");
-
-                    b.Property<int>("StartingWeight")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Progress");
                 });
 
             modelBuilder.Entity("FitMatrix.Models.Stats", b =>
@@ -149,17 +119,6 @@ namespace FitMatrix.Migrations
                 });
 
             modelBuilder.Entity("FitMatrix.Models.Goal", b =>
-                {
-                    b.HasOne("FitMatrix.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FitMatrix.Models.Progress", b =>
                 {
                     b.HasOne("FitMatrix.Models.User", "User")
                         .WithMany()
