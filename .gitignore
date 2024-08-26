@@ -234,3 +234,6 @@ _Pvt_Extensions
 # Exclude all the Mac .DS_Store
 **/.DS_Store
 
+
+# Local Netlify folder
+.netlify
