@@ -1,6 +1,13 @@
 import React from 'react'
 
 const User = () => {
+  // Mifflin St Joer Activity Levels
+  //   Multiply by scale factor for activity level:
+  // Sedentary *1.2
+  // Lightly active *1.375
+  // Moderately active *1.55
+  // Active *1.725
+  // Very active *1.9
   return (
     <main className="user-page">
       <nav>

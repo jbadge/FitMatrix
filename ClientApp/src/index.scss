@@ -158,25 +158,26 @@ label {
   }
 
   .calories-page {
-    position: relative;
-    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 6rem;
     h1 {
-      align-self: center;
+      // align-self: center;
       padding-bottom: 2rem;
-      position: absolute;
-      top: 17%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      margin: 0;
+      // position: absolute;
+      // top: 17%;
+      // left: 50%;
+      // transform: translate(-50%, -50%);
+      margin: 0 auto;
       text-align: center;
     }
     margin: 0 1rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    // Keep align-items?
     align-items: center;
-    height: 100vh;
     font-size: 20px;
     .calories-container {
       display: flex;
@@ -185,7 +186,6 @@ label {
       align-items: center;
     }
     .calories-input-container {
-      margin-top: 3rem;
       .calories-input-stats {
         margin-top: 2rem;
       }
@@ -195,7 +195,12 @@ label {
       }
     }
     .calories-user-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
       padding-top: 2rem;
+      margin-bottom: 2rem;
       font-size: 14px;
       visibility: hidden;
       opacity: 0;
@@ -204,7 +209,14 @@ label {
         opacity 0.5s linear;
       height: auto;
       & > div {
-        padding: 1rem;
+        padding: 0.4rem;
+      }
+      .result-row {
+        display: block;
+        .result-value {
+          padding-top: 0.5rem;
+          font-size: 1.2rem;
+        }
       }
     }
     .calories-user-stats.show {
@@ -215,7 +227,7 @@ label {
 
   .user-page {
     position: relative;
-    height: 100vh;
+    // height: 100vh;
     h1 {
       align-self: center;
       padding-bottom: 2rem;
@@ -232,7 +244,7 @@ label {
     justify-content: center;
     // Keep align-items?
     align-items: center;
-    height: 100vh;
+    // height: 100vh;
     font-size: 20px;
     .user-container {
     }
