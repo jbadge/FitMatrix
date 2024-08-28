@@ -186,6 +186,10 @@ label {
       align-items: center;
     }
     .calories-input-container {
+      .reminder {
+        display: block;
+        font-size: 0.8rem;
+      }
       .calories-input-stats {
         margin-top: 2rem;
       }

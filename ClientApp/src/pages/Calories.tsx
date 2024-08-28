@@ -1,26 +1,32 @@
 import React, { useState } from 'react'
 
 const Calories = () => {
-  //needs to get the user Stats for these calculations. Will use stubs for now
-  let heightMetric = 182.88
-  let heightImperial = 72
-  let weightMetric = 86.454706
-  let weightImperial = 190.6
-  let age = 48
+  // needs to get the user Stats for these calculations. Will use stubs for now
+  // Stats
+  let heightImperial = 69
+  let heightMetric = Math.round((heightImperial / 0.3937007874) * 100) / 100
+  let weightImperial = 208
+  let weightMetric = Math.round((weightImperial / 2.2046226218) * 100) / 100
+  let age = 29
   let sex = 'M'
   let activityLevel = 1.2
   let calories1 = 2000
-  let bodyFatPercent = 21.5
-  let tempLbmBoer = 0
-  let tempLbmHume = 0
-  let tempLbmJames = 0
-  let bmrMifflinCalc = 0
+  let bodyFatPercent = 0
   let tdeeCalc = 0
   let steps = 0
+  let measureSystem =
+    //
+    // 'metric'
+    'imperial'
 
   // Measurements
-  let waist = 37
-  let neck = 15.5
+  let waist = 40
+  let neck = 16.5
+  let hips = 52
+  let forearm = 11.5
+  let wrist = 6.5
+  let thigh = 25
+  let calf = 15
 
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('TDEE')
@@ -30,12 +36,16 @@ const Calories = () => {
   const [bmrKatch, setBmrKatch] = useState(0)
   const [rmrMifflin, setRmrMifflin] = useState(0)
   const [rmrKatch, setRmrKatch] = useState(0)
+  const [rmrCunningham, setRmrCunningham] = useState(0)
   const [tdeeMifflin, setTdeeMifflin] = useState(0)
   const [tdeeKatch, setTdeeKatch] = useState(0)
   const [lbmBoer, setLbmBoer] = useState(0)
-  const [lbmHume, setLbmHume] = useState(0)
-  const [lbmJames, setLbmJames] = useState(0)
+  const [lbmCalc, setLbmCalc] = useState(0)
+  const [covertBailey, setCovertBailey] = useState(0)
   const [navyBfp, setNavyBfp] = useState(0)
+  const [ymcaBfp, setYmcaBfp] = useState(0)
+  const [modYmcaBfp, setModYmcaBfp] = useState(0)
+  const [averageBfp, setAverageBfp] = useState(0)
   const [bmiBfp, setBmiBfp] = useState(0)
   const [bmi, setBmi] = useState(0)
 
@@ -46,58 +56,140 @@ const Calories = () => {
   }
 
   const calculateResults = () => {
-    // SOME (maybe ALL) Equations are in kg
+    /////////
+    // BMI //
+    /////////
+    // Not particular useful number, included for use in Heritage equation
+    const bmi = weightMetric / Math.pow(heightMetric / 100, 2)
+    setBmi(bmi)
 
     /////////////////////////
     // Body Fat Percentage //
     /////////////////////////
+
     // U.S. Navy Formula for Body Fat Percentage
     const navyBfpCalc =
-      // Imperial // 86.01 * Math.log10(37 - 15.5) - 70.041 * Math.log10(72) + 36.76
       // Metric
-      495 /
-        (1.0324 -
-          0.19077 * Math.log10(waist * 2.54 - neck * 2.54) +
-          0.15456 * Math.log10(heightImperial * 2.54)) -
-      450
-    setNavyBfp(navyBfpCalc)
+      measureSystem === 'metric'
+        ? sex === 'M'
+          ? 495 /
+              (1.0324 -
+                0.19077 * Math.log10(waist * 2.54 - neck * 2.54) +
+                0.15456 * Math.log10(heightMetric)) -
+            450
+          : // female calc off?
+            495 /
+              (1.29579 -
+                0.35004 * Math.log10(waist * 2.54 + hips * 2.54 - neck * 2.54) +
+                0.221 * Math.log10(heightMetric)) -
+            450
+        : // Imperial formula
+          sex === 'M'
+          ? 86.01 * Math.log10(waist - neck) -
+            70.041 * Math.log10(heightImperial) +
+            36.76
+          : 163.205 * Math.log10(waist + hips - neck) -
+            97.684 * Math.log10(heightImperial) -
+            78.387
 
-    /////////////////////////////////
-    // Lean Body Mass Calculations //
-    /////////////////////////////////
+    // Covert Bailey Formula
+    // Imperial formula
+    const covertBaileyCalc =
+      sex === 'F'
+        ? age < 30
+          ? hips + 0.8 * thigh - 2 * calf - wrist
+          : hips + thigh - 2 * calf - wrist
+        : age < 30
+          ? waist + 0.5 * hips - 3 * forearm - wrist
+          : waist + 0.5 * hips - 2.7 * forearm - wrist
+
+    // Heritage BMI to Body Fat Percentage Formula
+    // may be off (or bmi may be off)? It is off from the hubpages persons report
+    const bmiBfpCalc =
+      sex === 'F'
+        ? 1.39 * bmi + 0.16 * age - 9
+        : // (977.17 * weightImperial) / Math.pow(heightImperial, 2) +
+          // 0.16 * age -
+          // 19.34
+          1.39 * bmi + 0.16 * age - 19.34
+
+    // YMCA Body Fat Percentage Formula
+    const ymcaBfpCalc =
+      sex === 'M'
+        ? ((4.15 * waist - 0.082 * weightImperial - 98.42) / weightImperial) *
+          100
+        : ((4.15 * waist - 0.082 * weightImperial - 76.76) / weightImperial) *
+          100
+
+    // Modified YMCA Body Fat Percentage Formula
+    const modYmcaBfpCalc =
+      sex === 'M'
+        ? ((-0.082 * weightImperial + 4.15 * waist - 94.42) / weightImperial) *
+          100
+        : ((0.268 * weightImperial -
+            0.318 * wrist +
+            0.157 * waist +
+            0.245 * hips -
+            0.434 * forearm -
+            8.987) /
+            weightImperial) *
+          100
+
+    const averageBfpCalc =
+      (navyBfpCalc +
+        covertBaileyCalc +
+        bmiBfpCalc +
+        ymcaBfpCalc +
+        modYmcaBfpCalc) /
+      5
+
+    setNavyBfp(navyBfpCalc)
+    setCovertBailey(covertBaileyCalc)
+    setBmiBfp(bmiBfpCalc)
+    setYmcaBfp(ymcaBfpCalc)
+    setModYmcaBfp(modYmcaBfpCalc)
+    setAverageBfp(averageBfpCalc)
+
+    ////////////////////////////////
+    // Lean Body Mass Estimations //
+    ////////////////////////////////
+
+    // Calculated Lean Body Mass using recorded weight and Navy Method's result
+    const selectedBfp = bodyFatPercent === 0 ? navyBfpCalc : bodyFatPercent
+    let lbmKatchCalc = weightImperial * (1 - selectedBfp / 100)
+
     // Boer formula for obese individuals with a BMI between 35 and 40
-    if (sex === 'M') {
-      tempLbmBoer = 0.407 * weightMetric + 0.267 * heightMetric - 19.2
-      tempLbmHume = 0.3281 * weightMetric + 0.33929 * heightMetric - 29.5336
-      tempLbmJames =
-        1.1 * weightMetric - 128 * Math.pow(weightMetric / heightMetric, 2)
-    } else {
-      tempLbmBoer = 0.252 * weightMetric + 0.473 * heightMetric - 48.3
-      tempLbmHume = 0.29569 * weightMetric + 0.41813 * heightMetric - 43.2933
-      tempLbmJames =
-        1.07 * weightMetric - 148 * Math.pow(weightMetric / heightMetric, 2)
-    }
-    // Convert from kg to pounds
-    tempLbmBoer *= 2.20462
-    tempLbmHume *= 2.20462
-    tempLbmJames *= 2.20462
-    setLbmBoer(tempLbmBoer)
-    setLbmHume(tempLbmHume)
-    setLbmJames(tempLbmJames)
+    let lbmBoerCalc =
+      sex === 'M'
+        ? 0.407 * weightMetric + 0.267 * heightMetric - 19.2
+        : 0.252 * weightMetric + 0.473 * heightMetric - 48.3
+
+    // Hume formula used for drug dosages
+    // let lbmHumeCalc =
+    //   sex === 'M'
+    //     ? 0.3281 * weightMetric + 0.33929 * heightMetric - 29.5336
+    //     : 0.29569 * weightMetric + 0.41813 * heightMetric - 43.2933
+
+    // James formula used in obese individuals or those with abnormal body compositions
+    // let lbmJamesCalc =
+    //   sex === 'M'
+    //     ? 1.1 * weightMetric - 128 * Math.pow(weightMetric / heightMetric, 2)
+    //     : 1.07 * weightMetric - 148 * Math.pow(weightMetric / heightMetric, 2)
+
+    setLbmCalc(lbmKatchCalc)
+    setLbmBoer(measureSystem === 'metric' ? lbmBoerCalc * 2.20462 : lbmBoerCalc)
 
     //////////////////////
     // BMR Calculations //
     //////////////////////
+
     // Mifflin St Jeor Formula
-    bmrMifflinCalc = 10 * weightMetric + 6.25 * heightMetric - 5 * age
-    if (sex === 'M') {
-      bmrMifflinCalc += 5
-    } else {
-      bmrMifflinCalc -= 161
-    }
-    const rmrMifflinCalc = bmrMifflinCalc * 1.11
+    let bmrMifflinCalc =
+      sex === 'M'
+        ? 10 * weightMetric + 6.25 * heightMetric - 5 * age + 5
+        : 10 * weightMetric + 6.25 * heightMetric - 5 * age - 161
+
     // Katch-McArdle Formula
-    const selectedBfp = bodyFatPercent === 0 ? navyBfpCalc : bodyFatPercent
     const bmrKatchCalc = 370 + 21.6 * (weightMetric * (1 - selectedBfp / 100))
 
     setBmrKatch(bmrKatchCalc)
@@ -106,12 +198,16 @@ const Calories = () => {
     //////////////////
     // RDEE and RMR //
     //////////////////
+
+    // Cunningham Formula
+    const cunninghamCalc = 500 + 22 * (lbmKatchCalc / 2.20462)
     // Mifflin St Jeor Formula
-    // const rmrMifflinCalc =
-    // (9.99 * weightMetric + 6.25 * heightMetric - 4.92 * age + 5) * 1.11
+    const rmrMifflinCalc = bmrMifflinCalc * 1.11
     // Katch-McArdle Formula
     const rmrKatchCalc =
       (370 + 21.6 * (weightMetric * (1 - selectedBfp / 100))) * 1.11
+
+    setRmrCunningham(cunninghamCalc)
     setRmrMifflin(rmrMifflinCalc)
     setRmrKatch(rmrKatchCalc)
 
@@ -120,16 +216,9 @@ const Calories = () => {
     ///////////////////////
     const tdeeMifflinCalc = bmrMifflinCalc * activityLevel
     const tdeeKatchCalc = bmrKatchCalc * activityLevel
+
     setTdeeMifflin(tdeeMifflinCalc)
     setTdeeKatch(tdeeKatchCalc)
-
-    /////////
-    // BMI //
-    /////////
-    const bmi = weightMetric / Math.pow(heightMetric / 100, 2)
-    setBmi(bmi)
-    const bmiBfpCalc = 1.2 * bmi + 0.23 * age - 10.8 * 1 - 5.4
-    setBmiBfp(bmiBfpCalc)
   }
 
   return (
@@ -158,7 +247,10 @@ const Calories = () => {
             </p> */}
             <p className="form-input">
               <label htmlFor="calories">
-                Enter today&apos;s total calories:
+                Enter today&apos;s total calories:{' '}
+                <span className="reminder">
+                  Remember to measure RAW ingrediants
+                </span>
               </label>
               <input
                 type="number"
@@ -206,12 +298,20 @@ const Calories = () => {
                 <div className="result-value"> {bmrKatch.toFixed(0)} </div>
               </div>
               <div className="result-row">
+                <div className="result-label">RMR (Cunningham):</div>
+                <div className="result-value"> {rmrCunningham.toFixed(0)} </div>
+              </div>
+              <div className="result-row">
                 <div className="result-label">RMR (Mifflin St. Jeor):</div>
                 <div className="result-value"> {rmrMifflin.toFixed(0)} </div>
               </div>
               <div className="result-row">
                 <div className="result-label">RMR (Katch-McArdle):</div>
-                <div className="result-value"> {rmrKatch.toFixed(0)} </div>
+                <div className="result-value">{rmrKatch.toFixed(0)} </div>
+              </div>
+              <div className="result-row">
+                <div className="result-label"></div>
+                <div className="result-value"></div>
               </div>
             </>
           ) : null}
@@ -244,41 +344,59 @@ const Calories = () => {
                 <div className="result-label">
                   Lean Body Mass (calculated from Body Fat Percent):
                 </div>
-                <div className="result-value">
-                  {(weightImperial * (1 - bodyFatPercent / 100)).toFixed(1)}
-                </div>
+                <div className="result-value">{lbmCalc.toFixed(1)}</div>
               </div>
               <div className="result-row">
                 <div className="result-label">Lean Body Mass (Boer):</div>
-                <div className="result-value"> {lbmBoer.toFixed(1)}</div>
+                <div className="result-value">{lbmBoer.toFixed(1)}</div>
               </div>
-              <div className="result-row">
+              {/* <div className="result-row">
                 <div className="result-label">Lean Body Mass (James):</div>
-                <div className="result-value"> {lbmJames.toFixed(1)}</div>
+                <div className="result-value">{lbmJames.toFixed(1)}</div>
               </div>
               <div className="result-row">
                 <div className="result-label">Lean Body Mass (Hume):</div>
-                <div className="result-value"> {lbmHume.toFixed(1)}</div>
-              </div>
+                <div className="result-value">{lbmHume.toFixed(1)}</div>
+              </div> */}
             </>
           ) : null}
           {selectedFilter === 'ALL' || selectedFilter === 'BF%' ? (
             <>
+              {/* Body Fat Percentages */}
+              <div className="result-row">
+                <div className="result-label">Covert Bailey Method:</div>
+                <div className="result-value"> {covertBailey.toFixed(1)}%</div>
+              </div>
+              <div className="result-row">
+                <div className="result-label">Navy Method:</div>
+                <div className="result-value"> {navyBfp.toFixed(1)}%</div>
+              </div>
+              <div className="result-row">
+                <div className="result-label">YMCA Method:</div>
+                <div className="result-value"> {ymcaBfp.toFixed(1)}%</div>
+              </div>
+              <div className="result-row">
+                <div className="result-label">Modified YMCA Method:</div>
+                <div className="result-value"> {modYmcaBfp.toFixed(1)}%</div>
+              </div>
+
+              <div className="result-row">
+                <div className="result-label">
+                  Heritage BMI to Body Fat Percentage Method:
+                </div>
+                <div className="result-value"> {bmiBfp.toFixed(1)}%</div>
+              </div>
+              <div className="result-row">
+                <div className="result-label">Average Body Fat Percent:</div>
+                <div className="result-value"> {averageBfp.toFixed(1)}%</div>
+              </div>
               <div className="result-row">
                 <div className="result-label">BMI:</div>
                 <div className="result-value"> {bmi.toFixed(1)}</div>
               </div>
               <div className="result-row">
-                <div className="result-label">
-                  Navy Method - Body Fat Percent:
-                </div>
-                <div className="result-value"> {navyBfp.toFixed(1)}%</div>
-              </div>
-              <div className="result-row">
-                <div className="result-label">
-                  Body Fat Percentage (based on BMI):
-                </div>
-                <div className="result-value"> {bmiBfp.toFixed(1)}%</div>
+                <div className="result-label"></div>
+                <div className="result-value"></div>
               </div>
             </>
           ) : null}
