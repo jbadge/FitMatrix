@@ -27,3 +27,10 @@ export type LoginSuccess = {
   token: string
   user: LoggedInUser
 }
+
+export type userInputType = {
+  // heightMetric: number
+  // heightImperial: number
+  weightMetric: number
+  weightImperial: number
+}

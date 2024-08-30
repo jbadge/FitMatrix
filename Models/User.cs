@@ -32,5 +32,6 @@ namespace FitMatrix.Models
 
             return passwordVerification == PasswordVerificationResult.Success;
         }
+
     }
 }

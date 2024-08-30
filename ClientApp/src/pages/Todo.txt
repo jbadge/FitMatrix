@@ -1,1 +1,8 @@
 Stopped on Calorie entries, Weight, Calories.
+I believe NOW all calcs are done (at least for MVP)
+All the calculations need either to have metric and imp
+  OR
+  if only 1 version exists, make sure it uses that value
+    MAY HAVE FIXED THIS ALREADY
+
+move on...

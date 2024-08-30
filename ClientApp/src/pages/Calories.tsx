@@ -1,37 +1,47 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { userInputType } from '../types/types'
+
+// async function submitNewEntry(review: ReviewType) {
+//   const response = await fetch(`/api/Reviews`, {
+//     method: 'POST',
+//     headers: { 'content-type': 'application/json' },
+//     body: JSON.stringify(review),
+//   })
+
+//   if (response.ok) {
+//     return response.json()
+//   } else {
+//     throw await response.json()
+//   }
+// }
 
 const Calories = () => {
   // needs to get the user Stats for these calculations. Will use stubs for now
   // Stats
-  let heightImperial = 69
+  let heightImperial = 72
   let heightMetric = Math.round((heightImperial / 0.3937007874) * 100) / 100
-  let weightImperial = 208
-  let weightMetric = Math.round((weightImperial / 2.2046226218) * 100) / 100
-  let age = 29
+  let age = 48
   let sex = 'M'
   let activityLevel = 1.2
-  let calories1 = 2000
+  // let calories1 = 0 // 2000
   let bodyFatPercent = 0
   let tdeeCalc = 0
   let steps = 0
-  let measureSystem =
-    //
-    // 'metric'
-    'imperial'
 
   // Measurements
-  let waist = 40
-  let neck = 16.5
-  let hips = 52
-  let forearm = 11.5
-  let wrist = 6.5
+  let waist = 37
+  let neck = 14.5
+  let hips = 39
+  let forearm = 11.625
+  let wrist = 6.625
   let thigh = 25
   let calf = 15
 
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('TDEE')
-  const [weight, setWeight] = useState(weightMetric)
-  const [calories, setCalories] = useState(calories1)
+  const [unit, setUnit] = useState('imperial')
+  const [weight, setWeight] = useState(0)
+  const [calories, setCalories] = useState(0)
   const [bmrMifflin, setBmrMifflin] = useState(0)
   const [bmrKatch, setBmrKatch] = useState(0)
   const [rmrMifflin, setRmrMifflin] = useState(0)
@@ -48,14 +58,75 @@ const Calories = () => {
   const [averageBfp, setAverageBfp] = useState(0)
   const [bmiBfp, setBmiBfp] = useState(0)
   const [bmi, setBmi] = useState(0)
+  const [userInput, setUserInput] = useState<userInputType>({
+    // heightMetric: 182.88,
+    // heightImperial: 72,
+    weightMetric: 0,
+    weightImperial: 0,
+  })
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
-    calculateResults()
+    calculateResults(userInput)
     setIsSubmitted(true)
   }
 
-  const calculateResults = () => {
+  const convertToImperial = (kg: number) => kg * 2.20462
+  const convertToMetric = (lbs: number) => lbs / 2.20462
+
+  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    console.log(event.target)
+
+    const value = parseFloat(event.target.value)
+    const setMetric = unit === 'metric' ? value : convertToMetric(value)
+    const setImperial = unit === 'imperial' ? value : convertToImperial(value)
+
+    setUserInput({
+      weightMetric: setMetric,
+      weightImperial: setImperial,
+    })
+
+    setWeight(unit === 'metric' ? setMetric : setImperial)
+  }
+
+  const displayValue =
+    unit === 'metric'
+      ? Math.round(weight * 100) / 100
+      : Math.round(weight * 100) / 100
+
+  const toggleUnit = () => {
+    setUnit((prevUnit) => {
+      const newUnit = prevUnit === 'metric' ? 'imperial' : 'metric'
+
+      setUserInput((prevInput) => {
+        const newWeightMetric =
+          newUnit === 'metric'
+            ? prevInput.weightMetric
+            : convertToMetric(prevInput.weightImperial)
+        const newWeightImperial =
+          newUnit === 'imperial'
+            ? prevInput.weightImperial
+            : convertToImperial(prevInput.weightMetric)
+
+        setWeight(newUnit === 'metric' ? newWeightMetric : newWeightImperial)
+
+        return {
+          weightMetric: newWeightMetric,
+          weightImperial: newWeightImperial,
+        }
+      })
+      return newUnit
+    })
+  }
+
+  useEffect(() => {
+    calculateResults(userInput)
+  }, [unit, userInput])
+
+  const calculateResults = ({
+    weightMetric,
+    weightImperial,
+  }: userInputType) => {
     /////////
     // BMI //
     /////////
@@ -70,7 +141,7 @@ const Calories = () => {
     // U.S. Navy Formula for Body Fat Percentage
     const navyBfpCalc =
       // Metric
-      measureSystem === 'metric'
+      unit === 'metric'
         ? sex === 'M'
           ? 495 /
               (1.0324 -
@@ -105,7 +176,7 @@ const Calories = () => {
 
     // Heritage BMI to Body Fat Percentage Formula
     // may be off (or bmi may be off)? It is off from the hubpages persons report
-    const bmiBfpCalc =
+    const heritageBfpCalc =
       sex === 'F'
         ? 1.39 * bmi + 0.16 * age - 9
         : // (977.17 * weightImperial) / Math.pow(heightImperial, 2) +
@@ -136,16 +207,11 @@ const Calories = () => {
           100
 
     const averageBfpCalc =
-      (navyBfpCalc +
-        covertBaileyCalc +
-        bmiBfpCalc +
-        ymcaBfpCalc +
-        modYmcaBfpCalc) /
-      5
+      (navyBfpCalc + covertBaileyCalc + ymcaBfpCalc + modYmcaBfpCalc) / 4
 
     setNavyBfp(navyBfpCalc)
     setCovertBailey(covertBaileyCalc)
-    setBmiBfp(bmiBfpCalc)
+    setBmiBfp(heritageBfpCalc)
     setYmcaBfp(ymcaBfpCalc)
     setModYmcaBfp(modYmcaBfpCalc)
     setAverageBfp(averageBfpCalc)
@@ -160,9 +226,13 @@ const Calories = () => {
 
     // Boer formula for obese individuals with a BMI between 35 and 40
     let lbmBoerCalc =
-      sex === 'M'
-        ? 0.407 * weightMetric + 0.267 * heightMetric - 19.2
-        : 0.252 * weightMetric + 0.473 * heightMetric - 48.3
+      unit === 'metric'
+        ? sex === 'M'
+          ? 0.407 * weightMetric + 0.267 * heightMetric - 19.2
+          : 0.252 * weightMetric + 0.473 * heightMetric - 48.3
+        : sex === 'M'
+          ? (0.407 * weightMetric + 0.267 * heightMetric - 19.2) * 2.20462
+          : (0.252 * weightMetric + 0.473 * heightMetric - 48.3) * 2.20462
 
     // Hume formula used for drug dosages
     // let lbmHumeCalc =
@@ -177,7 +247,7 @@ const Calories = () => {
     //     : 1.07 * weightMetric - 148 * Math.pow(weightMetric / heightMetric, 2)
 
     setLbmCalc(lbmKatchCalc)
-    setLbmBoer(measureSystem === 'metric' ? lbmBoerCalc * 2.20462 : lbmBoerCalc)
+    setLbmBoer(lbmBoerCalc)
 
     //////////////////////
     // BMR Calculations //
@@ -229,7 +299,9 @@ const Calories = () => {
           {/* <div className="calories-input-stats">
             Enter today&apos;s weight:</div>
           </div> */}
-
+          <button onClick={toggleUnit}>
+            Switch to {unit === 'metric' ? 'Imperial' : 'Metric'}
+          </button>
           <form className="calories-input-container" onSubmit={handleSubmit}>
             <p className="form-input">
               <label htmlFor="weight">Enter today&apos;s weight:</label>
@@ -238,8 +310,11 @@ const Calories = () => {
                 type="number"
                 name="weight input"
                 placeholder="Weight"
-                value={weight}
-                onChange={(event) => setWeight(parseFloat(event.target.value))}
+                value={displayValue || ''}
+                onChange={
+                  handleInputChange
+                  // (event) => setWeight(parseFloat(event.target.value))
+                }
               />
             </p>
             {/* <p>
@@ -256,7 +331,7 @@ const Calories = () => {
                 type="number"
                 name="calories input"
                 placeholder="Calories"
-                value={calories}
+                value={calories || ''}
                 onChange={(event) =>
                   setCalories(parseFloat(event.target.value))
                 }
@@ -270,10 +345,10 @@ const Calories = () => {
 
         <div className={`calories-user-stats ${isSubmitted ? 'show' : ''}`}>
           <div className="button-group">
-            <button onClick={() => setSelectedFilter('TDEE')}>TDEE</button>
+            <button onClick={() => setSelectedFilter('BF%')}>BF%</button>
             <button onClick={() => setSelectedFilter('BMR')}>BMR</button>
             <button onClick={() => setSelectedFilter('LBM')}>LBM</button>
-            <button onClick={() => setSelectedFilter('BF%')}>BF%</button>
+            <button onClick={() => setSelectedFilter('TDEE')}>TDEE</button>
             <button onClick={() => setSelectedFilter('ALL')}>ALL</button>
           </div>
           {(selectedFilter === 'ALL' ||
