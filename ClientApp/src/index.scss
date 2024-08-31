@@ -74,9 +74,11 @@ input[type='number'] {
   &:focus-visible {
     outline: none;
   }
-  margin: 5px 0 0 10px;
-  height: 22px;
-  font-size: 20px;
+  & {
+    margin: 5px 0 0 10px;
+    height: 22px;
+    font-size: 20px;
+  }
 }
 
 label {
@@ -133,7 +135,9 @@ label {
       width: 50px;
       height: 50px;
     }
-    z-index: 1000;
+    & {
+      z-index: 1000;
+    }
   }
 
   nav {
@@ -163,6 +167,7 @@ label {
     justify-content: flex-start;
     align-items: center;
     padding-top: 6rem;
+    padding-bottom: 6rem;
     h1 {
       // align-self: center;
       padding-bottom: 2rem;
@@ -173,12 +178,14 @@ label {
       margin: 0 auto;
       text-align: center;
     }
-    margin: 0 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
+    & {
+      margin: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+    }
     .calories-container {
       display: flex;
       flex-direction: column;
@@ -242,39 +249,41 @@ label {
       margin: 0;
       text-align: center;
     }
-    margin: 0 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    // Keep align-items?
-    align-items: center;
-    // height: 100vh;
-    font-size: 20px;
-    .user-container {
-    }
-    .user-input-container {
-      .user-input-stats {
-        margin-top: 2rem;
+    & {
+      margin: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      // Keep align-items?
+      align-items: center;
+      // height: 100vh;
+      font-size: 20px;
+      .user-container {
       }
-      .user-input-user {
-        padding: 1rem;
-        color: grey;
+      .user-input-container {
+        .user-input-stats {
+          margin-top: 2rem;
+        }
+        .user-input-user {
+          padding: 1rem;
+          color: grey;
+        }
       }
-    }
-    .user-user-goals {
-      padding-top: 2rem;
-      font-size: 14px;
-      & > div {
-        padding: 1rem;
-      }
-      .goal-input {
-        border: solid 1px lightgray;
-        box-sizing: border-box;
-        padding: 5px;
-        position: fixed;
-        right: 0;
-        margin-right: 20%;
-        transform: translateY(-22%);
+      .user-user-goals {
+        padding-top: 2rem;
+        font-size: 14px;
+        & > div {
+          padding: 1rem;
+        }
+        .goal-input {
+          border: solid 1px lightgray;
+          box-sizing: border-box;
+          padding: 5px;
+          position: fixed;
+          right: 0;
+          margin-right: 20%;
+          transform: translateY(-22%);
+        }
       }
     }
   }
@@ -349,3 +358,204 @@ label {
 // input[type='submit']:active {
 //   background: var(--purple-2);
 // }
+
+.log-values {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 15px 5px 0 0;
+}
+
+nav.navbar-container {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+}
+
+.navbar {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .link {
+    width: auto;
+    display: flex;
+    align-self: center;
+  }
+  .welcome {
+    text-align: right;
+    width: 150px;
+    margin: 0;
+  }
+}
+
+li.avatar {
+  display: flex;
+}
+
+header .avatar {
+  width: 50px;
+  height: 50px;
+  img {
+    top: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
+  }
+  & {
+    z-index: 1000;
+  }
+}
+
+nav {
+  width: 100%;
+  height: 60px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #ced4db;
+  border-bottom: solid 1px black;
+}
+
+footer {
+  width: 100%;
+  height: 60px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: #ced4db;
+  border-top: solid 1px black;
+}
+
+.calories-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+  h1 {
+    // align-self: center;
+    padding-bottom: 2rem;
+    // position: absolute;
+    // top: 17%;
+    // left: 50%;
+    // transform: translate(-50%, -50%);
+    margin: 0 auto;
+    text-align: center;
+  }
+  & {
+    margin: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    .calories-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .calories-input-container {
+      .reminder {
+        display: block;
+        font-size: 0.8rem;
+      }
+      .calories-input-stats {
+        margin-top: 2rem;
+      }
+      .calories-input-user {
+        padding: 1rem;
+        color: grey;
+      }
+    }
+    .calories-user-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+      padding-top: 2rem;
+      margin-bottom: 2rem;
+      font-size: 14px;
+      visibility: hidden;
+      opacity: 0;
+      transition:
+        visibility 0s,
+        opacity 0.5s linear;
+      height: auto;
+      & > div {
+        padding: 0.4rem;
+      }
+      .result-row {
+        display: block;
+        .result-value {
+          padding-top: 0.5rem;
+          font-size: 1.2rem;
+        }
+      }
+    }
+    .calories-user-stats.show {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
+
+.user-page {
+  position: relative;
+  // height: 100vh;
+  h1 {
+    align-self: center;
+    padding-bottom: 2rem;
+    position: absolute;
+    top: 17%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    text-align: center;
+  }
+  & {
+    margin: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    // Keep align-items?
+    align-items: center;
+    // height: 100vh;
+    font-size: 20px;
+    .user-container {
+    }
+    .user-input-container {
+      .user-input-stats {
+        margin-top: 2rem;
+      }
+      .user-input-user {
+        padding: 1rem;
+        color: grey;
+      }
+    }
+    .user-user-goals {
+      padding-top: 2rem;
+      font-size: 14px;
+      & > div {
+        padding: 1rem;
+      }
+      .goal-input {
+        border: solid 1px lightgray;
+        box-sizing: border-box;
+        padding: 5px;
+        position: fixed;
+        right: 0;
+        margin-right: 20%;
+        transform: translateY(-22%);
+      }
+    }
+  }
+}
