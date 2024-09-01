@@ -18,24 +18,25 @@ import { userInputType } from '../types/types'
 const Calories = () => {
   // needs to get the user Stats for these calculations. Will use stubs for now
   // Stats
-  let heightImperial = 72
-  let heightMetric = Math.round((heightImperial / 0.3937007874) * 100) / 100
-  let age = 48
-  let sex = 'M'
-  let activityLevel = 1.2
-  // let calories1 = 0 // 2000
-  let bodyFatPercent = 0
-  let tdeeCalc = 0
-  let steps = 0
+  const heightImperial = 72
+  const heightMetric = Math.round((heightImperial / 0.3937007874) * 100) / 100
+  const age = 48
+  const sex: 'M' | 'F' = 'M'
+
+  const activityLevel = 1.2
+  // const calories1 = 0 // 2000
+  const bodyFatPercent = 0
+  const tdeeCalc = 0
+  const steps = 0
 
   // Measurements
-  let waist = 37
-  let neck = 14.5
-  let hips = 39
-  let forearm = 11.625
-  let wrist = 6.625
-  let thigh = 25
-  let calf = 15
+  const waist = 37
+  const neck = 14.5
+  const hips = 39
+  const forearm = 11.625
+  const wrist = 6.625
+  const thigh = 25
+  const calf = 15
 
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('TDEE')
@@ -166,23 +167,23 @@ const Calories = () => {
     // Covert Bailey Formula
     // Imperial formula
     const covertBaileyCalc =
-      sex === 'F'
+      sex === 'M'
         ? age < 30
-          ? hips + 0.8 * thigh - 2 * calf - wrist
-          : hips + thigh - 2 * calf - wrist
-        : age < 30
           ? waist + 0.5 * hips - 3 * forearm - wrist
           : waist + 0.5 * hips - 2.7 * forearm - wrist
+        : age < 30
+          ? hips + 0.8 * thigh - 2 * calf - wrist
+          : hips + thigh - 2 * calf - wrist
 
     // Heritage BMI to Body Fat Percentage Formula
     // may be off (or bmi may be off)? It is off from the hubpages persons report
     const heritageBfpCalc =
-      sex === 'F'
-        ? 1.39 * bmi + 0.16 * age - 9
-        : // (977.17 * weightImperial) / Math.pow(heightImperial, 2) +
+      sex === 'M'
+        ? // (977.17 * weightImperial) / Math.pow(heightImperial, 2) +
           // 0.16 * age -
           // 19.34
           1.39 * bmi + 0.16 * age - 19.34
+        : 1.39 * bmi + 0.16 * age - 9
 
     // YMCA Body Fat Percentage Formula
     const ymcaBfpCalc =
@@ -222,10 +223,10 @@ const Calories = () => {
 
     // Calculated Lean Body Mass using recorded weight and Navy Method's result
     const selectedBfp = bodyFatPercent === 0 ? navyBfpCalc : bodyFatPercent
-    let lbmKatchCalc = weightImperial * (1 - selectedBfp / 100)
+    const lbmKatchCalc = weightImperial * (1 - selectedBfp / 100)
 
     // Boer formula for obese individuals with a BMI between 35 and 40
-    let lbmBoerCalc =
+    const lbmBoerCalc =
       unit === 'metric'
         ? sex === 'M'
           ? 0.407 * weightMetric + 0.267 * heightMetric - 19.2
@@ -254,7 +255,7 @@ const Calories = () => {
     //////////////////////
 
     // Mifflin St Jeor Formula
-    let bmrMifflinCalc =
+    const bmrMifflinCalc =
       sex === 'M'
         ? 10 * weightMetric + 6.25 * heightMetric - 5 * age + 5
         : 10 * weightMetric + 6.25 * heightMetric - 5 * age - 161

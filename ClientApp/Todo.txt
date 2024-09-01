@@ -6,3 +6,6 @@ All the calculations need either to have metric and imp
     MAY HAVE FIXED THIS ALREADY
 
 move on...
+
+need to probably realign everything, but got user working. need to 
+record values in db

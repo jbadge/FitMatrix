@@ -9,7 +9,7 @@
         "build",
         "${workspaceFolder}/FitMatrix.csproj",
         "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
+        "/consoleloggerparameters:NoSummary;ForceNoAlign"
       ],
       "problemMatcher": "$msCompile"
     },
@@ -21,7 +21,7 @@
         "publish",
         "${workspaceFolder}/FitMatrix.csproj",
         "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
+        "/consoleloggerparameters:NoSummary;ForceNoAlign"
       ],
       "problemMatcher": "$msCompile"
     },
@@ -32,9 +32,8 @@
       "args": [
         "watch",
         "run",
-        "${workspaceFolder}/FitMatrix.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
+        "--project",
+        "${workspaceFolder}/FitMatrix.csproj"
       ],
       "problemMatcher": "$msCompile"
     }

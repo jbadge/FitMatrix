@@ -8,7 +8,6 @@ const SignedInNav = () => {
   const user = getUser()
 
   function handleLogout() {
-    console.log('her')
     logout()
 
     window.location.assign('/')
@@ -38,7 +37,12 @@ const SignedInNav = () => {
               Sign out
             </Link>
 
-            <p className="welcome">Welcome back, {user.fullName}!</p>
+            <p className="welcome">
+              Welcome back,
+              <Link to="/user" className="userLink">
+                {user.fullName}!
+              </Link>
+            </p>
           </div>
           <li className="avatar">
             <img
