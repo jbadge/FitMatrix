@@ -2,7 +2,7 @@
   "name": "react-project-template",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && eslint --ext .tsx,.ts . && vite build",
     "serve": "vite preview",
     "start": "vite",
@@ -17,8 +17,10 @@
     "useTabs": false
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "date-fns": "^3.6.0",
     "react": "^18.2.0",
+    "react-datepicker": "^7.3.0",
     "react-dom": "^18.2.0",
     "react-query": "^3.39.3",
     "react-router": "^6.23.0",

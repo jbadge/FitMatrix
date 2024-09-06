@@ -9,3 +9,18 @@ move on...
 
 need to probably realign everything, but got user working. need to 
 record values in db
+
+
+  const handleDateChange = (date: React.SetStateAction<Date>) => {
+    if (date !== null) {
+      setGoalDate(date)
+
+      setUserInfo((prev) => ({
+        ...prev,
+        goal: {
+          ...prev.goal,
+          goalDate: date,
+        },
+      }))
+    }
+  }

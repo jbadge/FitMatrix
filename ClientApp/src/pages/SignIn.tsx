@@ -28,7 +28,7 @@ export function SignIn() {
   const loginUserMutation = useMutation(loginUser, {
     onSuccess: function (apiResponse) {
       recordAuthentication(apiResponse)
-      window.location.assign('/')
+      window.location.assign(`/`)
     },
     onError: function (error: APIError) {
       setErrorMessage(Object.values(error.errors).join(' '))

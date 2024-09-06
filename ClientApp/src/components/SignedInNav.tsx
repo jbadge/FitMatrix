@@ -6,6 +6,7 @@ import avatar from '../../images/avatar.png'
 
 const SignedInNav = () => {
   const user = getUser()
+  // const { id } = useParams<{ id: string }>()
 
   function handleLogout() {
     logout()
@@ -21,6 +22,9 @@ const SignedInNav = () => {
     <ul>
       <li>
         <nav className="navbar-container">
+          <a href="/">
+            <i className="fa fa-home"></i>
+          </a>
           <div className="navbar">
             <Link
               to="/"
@@ -38,9 +42,10 @@ const SignedInNav = () => {
             </Link>
 
             <p className="welcome">
-              Welcome back,
-              <Link to="/user" className="userLink">
-                {user.fullName}!
+              <span className="nowrap">Welcome back,</span>
+              <Link to={`/users/${user.id}`} className="userLink">
+                {/* <span className="nowrap"> */}
+                {user.fullName}!{/* </span> */}
               </Link>
             </p>
           </div>

@@ -1,33 +1,28 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import Calories from './pages/Calories'
-import User from './pages/User'
-
 import { isLoggedIn } from './types/auth'
 import SignedInNav from './components/SignedInNav'
 import SignedOutNav from './components/SignedOutNav'
 
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
+import NewProgressEntry from './pages/NewProgressEntry'
+
+import UserStats from './pages/UserStats'
+import UserInfo from './pages/UserInfo'
 
 export function App() {
   return (
     <>
       <header>{isLoggedIn() ? <SignedInNav /> : <SignedOutNav />}</header>
-      {/* <ul>
-        <li>
-          <nav>
-            <Link to="/new">
-              <i className="fa fa-plus"></i> Calories
-            </Link>
-            <Link to="/signup">sign Up</Link>
-          </nav>
-        </li>
-      </ul> */}
+
       <Routes>
-        <Route path="/" element={<Calories />} />
-        <Route path="/user" element={<User />} />
+        {/* NEED INFO BACK IN THERE BUT WANTED DEFAULT TO NPE */}
+        <Route path="/users/:id/info" element={<UserInfo />} />
+        <Route path="/new" element={<NewProgressEntry />} />
+        <Route path="/" element={<NewProgressEntry />} />
+        <Route path="/users/:id" element={<UserStats />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
       </Routes>

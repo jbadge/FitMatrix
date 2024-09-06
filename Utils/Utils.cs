@@ -56,6 +56,8 @@ namespace FitMatrix.Utils
             if (ALLOW_APP_TO_BE_BROWSABLE_ON_THE_LOCAL_NETWORK && Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             {
                 builder = builder.UseUrls("http://*:5000/;https://*:5001");
+                // builder = builder.UseUrls("http://*:3000/;https://*:3001");
+
             }
 
             return builder.UseStartup<Startup>();

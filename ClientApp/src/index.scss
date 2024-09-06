@@ -62,9 +62,9 @@ footer {
   align-items: center;
 }
 
-.fa.fa-heart {
-  // color: red;
-}
+// .fa.fa-heart {
+//   // color: red;
+// }
 
 input[type='number'],
 input[type='text'] {
@@ -81,6 +81,37 @@ input[type='text'] {
     font-size: 20px;
   }
 }
+
+select {
+  border: none;
+  border-color: transparent;
+  // BELOW?
+  appearance: textfield;
+  &:focus-visible {
+    outline: none;
+  }
+  & {
+    margin: 5px 0 -5px 12px;
+    height: 20px;
+    font-size: 16px;
+  }
+}
+
+// .slider::-webkit-slider-thumb {
+//   -webkit-appearance: none; /* Override default look */
+//   appearance: none;
+//   width: 25px; /* Set a specific slider handle width */
+//   height: 25px; /* Slider handle height */
+//   background: #04aa6d; /* Green background */
+//   cursor: pointer; /* Cursor on hover */
+// }
+
+// .slider::-moz-range-thumb {
+//   width: 25px; /* Set a specific slider handle width */
+//   height: 25px; /* Slider handle height */
+//   background: #04aa6d; /* Green background */
+//   cursor: pointer; /* Cursor on hover */
+// }
 
 label {
   display: block;
@@ -184,10 +215,11 @@ nav.navbar-container {
     width: auto;
     display: flex;
     align-self: center;
+    width: 100%;
   }
   .welcome {
     text-align: right;
-    width: 150px;
+    width: 150%;
     margin: 0;
   }
 }
@@ -239,12 +271,7 @@ footer {
   padding-top: 6rem;
   padding-bottom: 6rem;
   h1 {
-    // align-self: center;
     padding-bottom: 2rem;
-    // position: absolute;
-    // top: 17%;
-    // left: 50%;
-    // transform: translate(-50%, -50%);
     margin: 0 auto;
     text-align: center;
   }
@@ -261,19 +288,19 @@ footer {
       justify-content: center;
       align-items: center;
     }
-    .calories-input-container {
-      .reminder {
-        display: block;
-        font-size: 0.8rem;
-      }
-      .calories-input-stats {
-        margin-top: 2rem;
-      }
-      .calories-input-user {
-        padding: 1rem;
-        color: grey;
-      }
+
+    .reminder {
+      display: block;
+      font-size: 0.8rem;
     }
+    .calories-input-stats {
+      margin-top: 2rem;
+    }
+    .calories-input-user {
+      padding: 1rem;
+      color: grey;
+    }
+
     .calories-user-stats {
       display: flex;
       flex-direction: column;
@@ -306,6 +333,13 @@ footer {
   }
 }
 
+.date-picker {
+  position: absolute;
+  top: 0;
+  right: 50;
+  transform: translateX(49%);
+}
+
 .user-page {
   display: flex;
   flex-direction: column;
@@ -326,15 +360,21 @@ footer {
     align-items: center;
     font-size: 20px;
     .user-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .user-stats-heading {
+        margin-bottom: 1rem;
+        text-align: center;
+      }
     }
-    .user-input-container {
-      .user-input-stats {
-        margin-top: 2rem;
-      }
-      .user-input-user {
-        padding: 1rem;
-        color: grey;
-      }
+    .user-input-stats {
+      margin-top: 2rem;
+    }
+    .user-input-user {
+      padding: 1rem;
+      color: grey;
     }
     .user-user-goals {
       position: relative;
@@ -360,8 +400,6 @@ footer {
         justify-content: space-between;
         line-height: 32px;
         position: relative;
-        .label-container {
-        }
         .input-container {
           position: absolute;
           right: 0;
@@ -369,24 +407,22 @@ footer {
           // transform: translateY(50%);
           // left: 20;
           // display: flex;
-          // flex-direciton: column;
+          // flex-direction: column;
         }
         .slider-input {
           position: absolute;
+          pointer-events: auto;
           top: 0;
-
-          transform: translate(-6%, 120%);
+          transform: translate(-110%, 120%);
           width: 100%;
         }
         .lose-placeholder {
-          position: relative;
-          top: 20px;
-          right: 41px;
+          position: absolute;
+          right: -80px;
         }
         .gain-placeholder {
           position: relative;
-          top: 20px;
-          right: 100px;
+          right: -22px;
         }
         input[type='checkbox']:disabled {
           opacity: 1;
@@ -411,6 +447,63 @@ footer {
     }
   }
 }
-
+// @media screen and (min-width: 600px) {
+.nowrap {
+  white-space: nowrap;
+  // display: none;
+}
+// }
 @media screen and (max-width: 400px) {
+  label {
+    padding: 10px; // need this so it does not overlap
+  }
+
+  .lose-placeholder {
+    position: absolute;
+    top: -1px;
+    right: -22px;
+    max-width: 150px;
+    margin-right: 60px;
+    line-height: 18px;
+  }
+  .gain-placeholder {
+    position: relative;
+    right: -22px;
+  }
+  .slider-input {
+    // -webkit-appearance: none; /* Override default look */
+    width: 100%; /* Make sure the slider takes up the full width */
+    height: 15px; /* Height of the slider track */
+    background: #ddd; /* Color of the slider track */
+    border-radius: 5px; /* Rounded corners for the slider track */
+    outline: none; /* Remove default focus outline */
+    opacity: 0.7; /* Slightly transparent */
+    transition: opacity 0.15s ease-in-out; /* Smooth transition for opacity changes */
+  }
+
+  .slider-input::-webkit-slider-thumb {
+    // -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 25px; /* Width of the slider thumb */
+    height: 25px; /* Height of the slider thumb */
+    background: #04aa6d; /* Color of the slider thumb */
+    cursor: pointer; /* Cursor style for the slider thumb */
+    border-radius: 50%; /* Rounded corners for the slider thumb */
+  }
+
+  .slider-input::-moz-range-thumb {
+    width: 25px; /* Width of the slider thumb */
+    height: 25px; /* Height of the slider thumb */
+    background: #04aa6d; /* Color of the slider thumb */
+    cursor: pointer; /* Cursor style for the slider thumb */
+    border-radius: 50%; /* Rounded corners for the slider thumb */
+  }
+
+  .slider-input::-ms-thumb {
+    width: 25px; /* Width of the slider thumb */
+    height: 25px; /* Height of the slider thumb */
+    background: #04aa6d; /* Color of the slider thumb */
+    cursor: pointer; /* Cursor style for the slider thumb */
+    border-radius: 50%; /* Rounded corners for the slider thumb */
+  }
 }

@@ -1,7 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FitMatrix.Models;
+using System.Linq;
+using System;
 
 namespace FitMatrix.Controllers
 {
@@ -20,6 +23,58 @@ namespace FitMatrix.Controllers
         public UsersController(DatabaseContext context)
         {
             _context = context;
+        }
+
+        // PUT: api/Users/5
+        //
+        // Update an individual user with the requested id. The id is specified in the URL
+        // In the sample URL above it is the `5`. The "{id} in the [HttpPut("{id}")] is what tells dotnet
+        // to grab the id from the URL. It is then made available to us as the `id` argument to the method.
+        //
+        // In addition the `body` of the request is parsed and then made available to us as a User
+        // variable named user. The controller matches the keys of the JSON object the client
+        // supplies to the names of the attributes of our User POCO class. This represents the
+        // new values for the record.
+        //
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutUser(int id, User user)
+        {
+            // If the ID in the URL does not match the ID in the supplied request body, return a bad request
+            if (id != user.Id)
+            {
+                return BadRequest();
+            }
+
+            // Tell the database to consider everything in user to be _updated_ values. When
+            // the save happens the database will _replace_ the values in the database with the ones from user
+            _context.Entry(user).State = EntityState.Modified;
+
+            try
+            {
+                // Try to save these changes.
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Ooops, looks like there was an error, so check to see if the record we were
+                // updating no longer exists.
+                if (!UserExists(id))
+                {
+                    // If the record we tried to update was already deleted by someone else,
+                    // return a `404` not found
+                    return NotFound();
+                }
+                else
+                {
+                    // Otherwise throw the error back, which will cause the request to fail
+                    // and generate an error to the client.
+                    throw;
+                }
+            }
+
+            Console.WriteLine(user);
+            // Return a copy of the updated data
+            return Ok(user);
         }
 
         // POST: api/Users
@@ -56,6 +111,11 @@ namespace FitMatrix.Controllers
                 // Return our error with the custom response
                 return BadRequest(response);
             }
+        }
+        // Private helper method that looks up an existing user by the supplied id
+        private bool UserExists(int id)
+        {
+            return _context.Users.Any(user => user.Id == id);
         }
     }
 }

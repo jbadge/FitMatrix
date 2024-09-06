@@ -12,7 +12,10 @@ namespace FitMatrix
     {
         public static async Task Main(string[] args)
         {
-            var host = Utilities.CreateWebHostBuilder(args).Build();
+            // var host = Utilities.CreateWebHostBuilder(args).Build();
+            var host = Utilities.CreateWebHostBuilder(args)
+                          .UseUrls("http://*:5000")
+                       .Build();
 
             using (var scope = host.Services.CreateScope())
             {

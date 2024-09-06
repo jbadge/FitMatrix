@@ -8,10 +8,10 @@ namespace FitMatrix.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "You must provide your name.")]
+        // [Required(ErrorMessage = "You must provide your name.")]
         public string FullName { get; set; }
 
-        [Required(ErrorMessage = "You must provide your email.")]
+        // [Required(ErrorMessage = "You must provide your email.")]
         public string Email { get; set; }
 
         [JsonIgnore]
@@ -32,6 +32,8 @@ namespace FitMatrix.Models
 
             return passwordVerification == PasswordVerificationResult.Success;
         }
-
+        public Stats Stats { get; set; }
+        public Goal Goal { get; set; }
+        public Progress Progress { get; set; }
     }
 }

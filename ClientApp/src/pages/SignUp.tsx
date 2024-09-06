@@ -25,6 +25,9 @@ export function SignUp() {
     fullName: '',
     email: '',
     password: '',
+    stats: {},
+    goal: {},
+    progress: {},
   })
 
   const createUserMutation = useMutation(
