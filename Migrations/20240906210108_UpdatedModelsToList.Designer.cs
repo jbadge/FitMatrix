@@ -3,6 +3,7 @@ using System;
 using FitMatrix.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FitMatrix.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240906210108_UpdatedModelsToList")]
+    partial class UpdatedModelsToList
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,20 +33,20 @@ namespace FitMatrix.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("GoalBodyFatPercent")
-                        .HasColumnType("double precision");
+                    b.Property<int>("GoalBodyFatPercent")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("GoalDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<double>("GoalRate")
-                        .HasColumnType("double precision");
+                    b.Property<int>("GoalRate")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("GoalSelection")
+                    b.Property<string>("GoalType")
                         .HasColumnType("text");
 
-                    b.Property<double>("GoalWeight")
-                        .HasColumnType("double precision");
+                    b.Property<int>("GoalWeight")
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -63,20 +66,20 @@ namespace FitMatrix.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("BodyFatPercent")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("Calories")
+                    b.Property<int>("ActivityLevel")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("DoE")
+                    b.Property<DateTime>("DoB")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<double>("ProgressWeightImperial")
-                        .HasColumnType("double precision");
+                    b.Property<int>("Height")
+                        .HasColumnType("integer");
 
-                    b.Property<double>("ProgressWeightMetric")
-                        .HasColumnType("double precision");
+                    b.Property<string>("Sex")
+                        .HasColumnType("text");
+
+                    b.Property<int>("StartingWeight")
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -96,38 +99,23 @@ namespace FitMatrix.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("ActivityLevel")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("ActivityLevelLabel")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Age")
+                    b.Property<int>("ActivityLevel")
                         .HasColumnType("integer");
-
-                    b.Property<double>("BodyFatPercent")
-                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("DoB")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<double>("HeightImperial")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("HeightMetric")
-                        .HasColumnType("double precision");
+                    b.Property<int>("Height")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Sex")
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("StartingWeight")
                         .HasColumnType("integer");
 
-                    b.Property<double>("WeightImperial")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("WeightMetric")
-                        .HasColumnType("double precision");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -145,11 +133,9 @@ namespace FitMatrix.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("HashedPassword")

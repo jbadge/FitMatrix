@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { APIError, LoginSuccess, LoginUserType } from '../types/types'
 import { useMutation } from 'react-query'
-import { recordAuthentication } from '../types/auth'
+import { getUser, getUserId, recordAuthentication } from '../types/auth'
+import { useParams } from 'react-router-dom'
 
 async function loginUser(user: LoginUserType): Promise<LoginSuccess> {
   const response = await fetch('/api/Sessions', {
@@ -19,6 +20,8 @@ async function loginUser(user: LoginUserType): Promise<LoginSuccess> {
 
 export function SignIn() {
   const [errorMessage, setErrorMessage] = React.useState('')
+  const { id } = useParams() as { id: string }
+  // const id = getUserId()
 
   const [user, setUser] = React.useState<LoginUserType>({
     email: '',
@@ -28,7 +31,9 @@ export function SignIn() {
   const loginUserMutation = useMutation(loginUser, {
     onSuccess: function (apiResponse) {
       recordAuthentication(apiResponse)
-      window.location.assign(`/`)
+      const id = apiResponse.user.id
+
+      window.location.assign(`/Users/${id}/Progress`)
     },
     onError: function (error: APIError) {
       setErrorMessage(Object.values(error.errors).join(' '))
@@ -44,44 +49,52 @@ export function SignIn() {
     setUser(updatedUser)
   }
 
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    console.log('user: ', user)
+    // debugger
+    loginUserMutation.mutate(user)
+  }
+
+  useEffect(() => {
+    // const id = getUserId()
+    console.log(id)
+  }, [])
   return (
-    <main className="page">
-      <nav>
-        <a href="/">
+    <main className="user-page">
+      <nav className="navbar-container">
+        {/* <a href={`/users/${id}/Progress`}>
           <i className="fa fa-home"></i>
         </a>
-        <h2>Sign In</h2>
+        <h2>Sign In</h2> */}
       </nav>
-      <form
-        onSubmit={function (event) {
-          event.preventDefault()
-
-          loginUserMutation.mutate(user)
-        }}
-      >
-        {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
-        <p className="form-input">
-          <label htmlFor="name">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={user.email}
-            onChange={handleStringFieldChange}
-          />
-        </p>
-        <p className="form-input">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={user.password}
-            onChange={handleStringFieldChange}
-          />
-        </p>
-        <p>
-          <input type="submit" value="Submit" />
-        </p>
-      </form>
+      <h1>FitMatrix</h1>
+      <div className="user-container">
+        <form onSubmit={handleFormSubmit}>
+          {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
+          <p className="form-input">
+            <label htmlFor="name">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={user.email}
+              onChange={handleStringFieldChange}
+            />
+          </p>
+          <p className="form-input">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={user.password}
+              onChange={handleStringFieldChange}
+            />
+          </p>
+          <p>
+            <input type="submit" value="Submit" />
+          </p>
+        </form>
+      </div>
     </main>
   )
 }

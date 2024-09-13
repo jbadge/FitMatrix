@@ -1,26 +1,3 @@
-Stopped on Calorie entries, Weight, Calories.
-I believe NOW all calcs are done (at least for MVP)
-All the calculations need either to have metric and imp
-  OR
-  if only 1 version exists, make sure it uses that value
-    MAY HAVE FIXED THIS ALREADY
-
-move on...
-
-need to probably realign everything, but got user working. need to 
-record values in db
-
-
-  const handleDateChange = (date: React.SetStateAction<Date>) => {
-    if (date !== null) {
-      setGoalDate(date)
-
-      setUserInfo((prev) => ({
-        ...prev,
-        goal: {
-          ...prev.goal,
-          goalDate: date,
-        },
-      }))
-    }
-  }
+need help with the date for age (change m,d ,y to span)
+need user to stay signed in after signing up
+need help making 0.5 steps in lose fat with max being 10%

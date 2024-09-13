@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using FitMatrix.Models;
 using System.Linq;
 using System;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FitMatrix.Controllers
 {
@@ -23,6 +25,30 @@ namespace FitMatrix.Controllers
         public UsersController(DatabaseContext context)
         {
             _context = context;
+        }
+
+        // GET: api/Users/5
+        //
+        // Fetches and returns a specific user by finding it by id. The id is specified in the
+        // URL. In the sample URL above it is the `5`.  The "{id}" in the [HttpGet("{id}")] is what tells dotnet
+        // to grab the id from the URL. It is then made available to us as the `id` argument to the method.
+        //
+        [HttpGet("{id}")]
+        public async Task<ActionResult<User>> GetUser(int id)
+        {
+            // Find the pet in the database using `FindAsync` to look it up by id
+            // var pet = await _context.Pets.FindAsync(id);
+            var user = await _context.Users.Include(user => user.Stats).Include(user => user.Goal).Include(user => user.Progress).FirstOrDefaultAsync(x => x.Id == id);
+
+            // If we didn't find anything, we receive a `null` in return
+            if (user == null)
+            {
+                // Return a `404` response to the client indicating we could not find a user with this id
+                return NotFound();
+            }
+
+            // Return the user as a JSON object.
+            return user;
         }
 
         // PUT: api/Users/5
@@ -99,7 +125,7 @@ namespace FitMatrix.Controllers
                 // headers with details of the newly created object.
                 return CreatedAtAction("GetUser", new { id = user.Id }, user);
             }
-            catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+            catch (DbUpdateException)
             {
                 // Make a custom error response
                 var response = new
@@ -112,10 +138,78 @@ namespace FitMatrix.Controllers
                 return BadRequest(response);
             }
         }
+
+        // Add stats to a user
+        // POST: /api/Users/5/Stats
+        [HttpPost("{userId}/stats")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Stats>> CreateStatsForUser(int userId, Stats stats)
+        {
+            // stats.UserId = GetCurrentUserId();
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _context.Stats.Add(stats);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction("GetStats", new { id = stats.Id }, stats);
+        }
+
+        // Add goal to a user
+        // POST: /api/Users/5/Goal
+        [HttpPost("{userId}/goal")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Goal>> CreateGoalForUser(int userId, Goal goal)
+        {
+            // goal.UserId = GetCurrentUserId();
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            _context.Goal.Add(goal);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetGoal", new { id = goal.Id }, goal);
+        }
+
+        // Add progress to a user
+        // POST: /api/Users/5/Progress
+        [HttpPost("{userId}/progress")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Progress>> CreateProgressForUser(int userId, Progress progress)
+        {
+            // progress.UserId = GetCurrentUserId();
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            _context.Progress.Add(progress);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetProgress", new { id = progress.Id }, progress);
+        }
+
         // Private helper method that looks up an existing user by the supplied id
         private bool UserExists(int id)
         {
             return _context.Users.Any(user => user.Id == id);
         }
+
+        // Private helper method to get the JWT claim related to the user ID
+        private int GetCurrentUserId()
+        {
+            //  if (user == null)
+            // {
+            //     return NotFound();
+            // }
+            // Get the User Id from the claim and then parse it as an integer.
+            return int.Parse(User.Claims.FirstOrDefault(claim => claim.Type == "Id").Value);
+        }
+
     }
 }

@@ -1,36 +1,41 @@
 import React, { useEffect, useState } from 'react'
-import { APIError, ProgressType, UserType } from '../types/types'
-import { authHeader, getUser } from '../types/auth'
-import { useNavigate } from 'react-router'
+import { APIError, ProgressType } from '../types/types'
+import { authHeader } from '../types/auth'
+import { useNavigate, useParams } from 'react-router'
 import { useMutation } from 'react-query'
 
-async function submitProgress(entryToCreate: ProgressType) {
-  const response = await fetch('/api/Users/:username', {
+async function submitProgress(id: number, entry: ProgressType) {
+  // const userId = Number(id)
+  console.log('id: ', entry)
+  const response = await fetch(`/api/Users/${id}/progress`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
       Authorization: authHeader(),
     },
-    body: JSON.stringify(entryToCreate),
+    body: JSON.stringify(entry),
   })
 
+  // console.log('response: ', response)
   if (response.ok) {
     return response.json()
   } else {
     throw await response.json()
   }
 }
+// Need to make sure IF LOGGED IN it routes to /user/id/progress!!
 
-const NewProgressEntry = () => {
+const Progress = () => {
+  // const [userId, setUserId] = useState(0)
+  const { id } = useParams() as { id: string }
+
   // needs to get the user Stats for these calculations. Will use stubs for now
   // Stats
   const heightImperial = 72
   const heightMetric = Math.round((heightImperial / 0.3937007874) * 100) / 100
   const age = 48
   const sex: 'M' | 'F' = 'M'
-
   const activityLevel = 1.2
-  // const calories1 = 0 // 2000
   const bodyFatPercent = 0
   const tdeeCalc = 0
   const steps = 0
@@ -47,8 +52,8 @@ const NewProgressEntry = () => {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [selectedFilter, setSelectedFilter] = useState('TDEE')
   const [unit, setUnit] = useState('imperial')
-  const [weight, setWeight] = useState(0)
-  const [calories, setCalories] = useState(0)
+  const [weight, setWeight] = useState(187) //0)
+  const [calories, setCalories] = useState(1500) //0)
   const [bmrMifflin, setBmrMifflin] = useState(0)
   const [bmrKatch, setBmrKatch] = useState(0)
   const [rmrMifflin, setRmrMifflin] = useState(0)
@@ -66,41 +71,16 @@ const NewProgressEntry = () => {
   const [bmiBfp, setBmiBfp] = useState(0)
   const [bmi, setBmi] = useState(0)
   const [progress, setProgress] = useState<ProgressType>({
-    weightMetric: 0,
-    weightImperial: 0,
+    userId: 0,
+    progressWeightImperial: 0,
+    progressWeightMetric: 0,
     calories: 0,
+    bodyFatPercent: 0,
   })
   const navigate = useNavigate()
 
-  const [user, setUser] = useState<UserType>({
-    fullName: '',
-    email: '',
-    stats: {
-      age: 0,
-      sex: 'M',
-      heightMetric: 0,
-      heightImperial: 0,
-      weightMetric: 0,
-      weightImperial: 0,
-      activityLevel: 1.2,
-      activityLevelLabel: 'Sedentary',
-    },
-    goal: {
-      goalSelection: 'maintain',
-      goalWeight: 0,
-      goalRate: 0,
-      goalBfp: 0,
-      goalDate: new Date(),
-    },
-    progress: {
-      weightMetric: 0,
-      weightImperial: 0,
-      calories: 0,
-    },
-  })
-
   const createProgressMutation = useMutation(
-    (progress: ProgressType) => submitProgress(progress),
+    (progress: ProgressType) => submitProgress(Number(id), progress),
     {
       onSuccess: function () {
         navigate('/')
@@ -113,13 +93,27 @@ const NewProgressEntry = () => {
 
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
     calculateResults(progress)
     setIsSubmitted(true)
-    //
-    console.log(user)
-    //
+
     createProgressMutation.mutate(progress)
   }
+
+  useEffect(() => {
+    // const user = getUser()
+    // if (user) {
+    //   const id = user.id
+
+    //   setUserId(id)
+    // }
+    setProgress((prev) => ({
+      ...prev,
+      calories: calories,
+      progressWeightImperial: weight,
+      progressWeightMetric: convertToMetric(weight),
+    }))
+  }, [])
 
   const convertToImperial = (kg: number) => kg * 2.20462
   const convertToMetric = (lbs: number) => lbs / 2.20462
@@ -128,22 +122,28 @@ const NewProgressEntry = () => {
     const name = event.target.name
     const value = parseFloat(event.target.value)
 
+    if (progress.userId === 0) {
+      setProgress((prev) => ({
+        ...prev,
+        userId: Number(id),
+      }))
+    }
+
     if (name === 'weight') {
       if (unit === 'metric') {
         setWeight(value)
         setProgress((prev) => ({
           ...prev,
-          weightMetric: value,
-          weightImperial: convertToImperial(value),
+          progressWeightMetric: value,
+          progressWeightImperial: convertToImperial(value),
           calories: prev.calories,
         }))
       } else if (unit === 'imperial') {
-        console.log(value)
         setWeight(value)
         setProgress((prev) => ({
           ...prev,
-          weightMetric: convertToMetric(value),
-          weightImperial: value,
+          progressWeightMetric: convertToMetric(value),
+          progressWeightImperial: value,
           calories: prev.calories,
         }))
       }
@@ -153,8 +153,8 @@ const NewProgressEntry = () => {
       setCalories(value)
       setProgress((prev) => ({
         ...prev,
-        weightMetric: prev.weightMetric,
-        weightImperial: prev.weightImperial,
+        progressWeightMetric: prev.progressWeightMetric,
+        progressWeightImperial: prev.progressWeightImperial,
         calories: value,
       }))
     }
@@ -172,19 +172,19 @@ const NewProgressEntry = () => {
       setProgress((prevInput) => {
         const newWeightMetric =
           newUnit === 'metric'
-            ? prevInput.weightMetric!
-            : convertToMetric(prevInput.weightImperial!)
+            ? prevInput.progressWeightMetric!
+            : convertToMetric(prevInput.progressWeightImperial!)
         const newWeightImperial =
           newUnit === 'imperial'
-            ? prevInput.weightImperial!
-            : convertToImperial(prevInput.weightMetric!)
+            ? prevInput.progressWeightImperial!
+            : convertToImperial(prevInput.progressWeightMetric!)
         const date = new Date()
         setWeight(newUnit === 'metric' ? newWeightMetric : newWeightImperial)
 
         return {
           dateOfEntry: date,
-          weightMetric: newWeightMetric,
-          weightImperial: newWeightImperial,
+          progressWeightMetric: newWeightMetric,
+          progressWeightImperial: newWeightImperial,
           calories: calories,
         }
       })
@@ -196,12 +196,15 @@ const NewProgressEntry = () => {
     calculateResults(progress)
   }, [unit, progress])
 
-  const calculateResults = ({ weightMetric, weightImperial }: ProgressType) => {
+  const calculateResults = ({
+    progressWeightMetric,
+    progressWeightImperial,
+  }: ProgressType) => {
     /////////
     // BMI //
     /////////
     // Not particular useful number, included for use in Heritage equation
-    const bmi = weightMetric! / Math.pow(heightMetric / 100, 2)
+    const bmi = progressWeightMetric! / Math.pow(heightMetric / 100, 2)
     setBmi(bmi)
 
     /////////////////////////
@@ -257,24 +260,26 @@ const NewProgressEntry = () => {
     // YMCA Body Fat Percentage Formula
     const ymcaBfpCalc =
       sex === 'M'
-        ? ((4.15 * waist - 0.082 * weightImperial! - 98.42) / weightImperial!) *
+        ? ((4.15 * waist - 0.082 * progressWeightImperial! - 98.42) /
+            progressWeightImperial!) *
           100
-        : ((4.15 * waist - 0.082 * weightImperial! - 76.76) / weightImperial!) *
+        : ((4.15 * waist - 0.082 * progressWeightImperial! - 76.76) /
+            progressWeightImperial!) *
           100
 
     // Modified YMCA Body Fat Percentage Formula
     const modYmcaBfpCalc =
       sex === 'M'
-        ? ((-0.082 * weightImperial! + 4.15 * waist - 94.42) /
-            weightImperial!) *
+        ? ((-0.082 * progressWeightImperial! + 4.15 * waist - 94.42) /
+            progressWeightImperial!) *
           100
-        : ((0.268 * weightImperial! -
+        : ((0.268 * progressWeightImperial! -
             0.318 * wrist +
             0.157 * waist +
             0.245 * hips -
             0.434 * forearm -
             8.987) /
-            weightImperial!) *
+            progressWeightImperial!) *
           100
 
     const averageBfpCalc =
@@ -293,17 +298,19 @@ const NewProgressEntry = () => {
 
     // Calculated Lean Body Mass using recorded weight and Navy Method's result
     const selectedBfp = bodyFatPercent === 0 ? navyBfpCalc : bodyFatPercent
-    const lbmKatchCalc = weightImperial! * (1 - selectedBfp / 100)
+    const lbmKatchCalc = progressWeightImperial! * (1 - selectedBfp / 100)
 
     // Boer formula for obese individuals with a BMI between 35 and 40
     const lbmBoerCalc =
       unit === 'metric'
         ? sex === 'M'
-          ? 0.407 * weightMetric! + 0.267 * heightMetric - 19.2
-          : 0.252 * weightMetric! + 0.473 * heightMetric - 48.3
+          ? 0.407 * progressWeightMetric! + 0.267 * heightMetric - 19.2
+          : 0.252 * progressWeightMetric! + 0.473 * heightMetric - 48.3
         : sex === 'M'
-          ? (0.407 * weightMetric! + 0.267 * heightMetric - 19.2) * 2.20462
-          : (0.252 * weightMetric! + 0.473 * heightMetric - 48.3) * 2.20462
+          ? (0.407 * progressWeightMetric! + 0.267 * heightMetric - 19.2) *
+            2.20462
+          : (0.252 * progressWeightMetric! + 0.473 * heightMetric - 48.3) *
+            2.20462
 
     // Hume formula used for drug dosages
     // let lbmHumeCalc =
@@ -327,11 +334,12 @@ const NewProgressEntry = () => {
     // Mifflin St Jeor Formula
     const bmrMifflinCalc =
       sex === 'M'
-        ? 10 * weightMetric! + 6.25 * heightMetric - 5 * age + 5
-        : 10 * weightMetric! + 6.25 * heightMetric - 5 * age - 161
+        ? 10 * progressWeightMetric! + 6.25 * heightMetric - 5 * age + 5
+        : 10 * progressWeightMetric! + 6.25 * heightMetric - 5 * age - 161
 
     // Katch-McArdle Formula
-    const bmrKatchCalc = 370 + 21.6 * (weightMetric! * (1 - selectedBfp / 100))
+    const bmrKatchCalc =
+      370 + 21.6 * (progressWeightMetric! * (1 - selectedBfp / 100))
 
     setBmrKatch(bmrKatchCalc)
     setBmrMifflin(bmrMifflinCalc)
@@ -346,7 +354,7 @@ const NewProgressEntry = () => {
     const rmrMifflinCalc = bmrMifflinCalc * 1.11
     // Katch-McArdle Formula
     const rmrKatchCalc =
-      (370 + 21.6 * (weightMetric! * (1 - selectedBfp / 100))) * 1.11
+      (370 + 21.6 * (progressWeightMetric! * (1 - selectedBfp / 100))) * 1.11
 
     setRmrCunningham(cunninghamCalc)
     setRmrMifflin(rmrMifflinCalc)
@@ -361,15 +369,6 @@ const NewProgressEntry = () => {
     setTdeeMifflin(tdeeMifflinCalc)
     setTdeeKatch(tdeeKatchCalc)
   }
-
-  useEffect(() => {
-    const tempUser = getUser()
-    setUser((prev) => ({
-      ...prev,
-      fullName: tempUser.fullName,
-      email: tempUser.email,
-    }))
-  }, [])
 
   return (
     <main className="calories-page">
@@ -405,15 +404,12 @@ const NewProgressEntry = () => {
               placeholder="Calories"
               value={calories || ''}
               onChange={handleInputChange}
-              // onChange={(event) => setCalories(parseFloat(event.target.value))}
             />
           </p>
           <p>
             <input type="submit" value="Submit" />
           </p>
         </form>
-        {/* </div> */}
-
         <div className={`calories-user-stats ${isSubmitted ? 'show' : ''}`}>
           <div className="button-group">
             <button onClick={() => setSelectedFilter('BF%')}>BF%</button>
@@ -558,4 +554,4 @@ const NewProgressEntry = () => {
   )
 }
 
-export default NewProgressEntry
+export default Progress

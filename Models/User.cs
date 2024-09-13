@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
@@ -8,14 +9,18 @@ namespace FitMatrix.Models
     {
         public int Id { get; set; }
 
-        // [Required(ErrorMessage = "You must provide your name.")]
+        [Required(ErrorMessage = "You must provide your name.")]
         public string FullName { get; set; }
 
-        // [Required(ErrorMessage = "You must provide your email.")]
+        [Required(ErrorMessage = "You must provide your email.")]
         public string Email { get; set; }
 
         [JsonIgnore]
         public string HashedPassword { get; set; }
+
+        public List<Stats> Stats { get; set; }
+        public List<Goal> Goal { get; set; }
+        public List<Progress> Progress { get; set; }
 
         public string Password
         {
@@ -32,8 +37,6 @@ namespace FitMatrix.Models
 
             return passwordVerification == PasswordVerificationResult.Success;
         }
-        public Stats Stats { get; set; }
-        public Goal Goal { get; set; }
-        public Progress Progress { get; set; }
+
     }
 }

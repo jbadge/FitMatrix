@@ -1,10 +1,10 @@
-export type SexOptionsType = 'M' | 'F'
+export type SexOptionsType = 'M' | 'F' | 'U'
 
 export type GoalOptionsType = 'lose' | 'gain' | 'maintain'
 
 export type ActivityLevelType =
-  | 'Sedentary'
   | 'None'
+  | 'Sedentary'
   | 'Light'
   | 'Moderate'
   | 'Heavy'
@@ -23,25 +23,24 @@ export type NewUserType = {
   fullName: string
   email: string
   password: string
-
-  stats: StatsType
-  goal: GoalType
-  progress: ProgressType
+  stats: [] | undefined
+  goal: [] | undefined
+  progress: [] | undefined
 }
 
 export type UserType = {
   id?: number
   fullName: string
   email: string
-  stats: StatsType
-  goal?: GoalType
-  progress?: ProgressType
+  stats: [] | undefined
+  goal: [] | undefined
+  progress: [] | undefined
 }
 
 export type StatsType = {
-  id?: number
   userId?: number
   age?: number
+  doB?: Date
   sex?: SexOptionsType
   heightMetric?: number
   heightImperial?: number
@@ -49,10 +48,10 @@ export type StatsType = {
   weightImperial?: number
   activityLevel?: number
   activityLevelLabel?: ActivityLevelType
+  bodyFatPercent?: number
 }
 
 export type GoalType = {
-  id?: number
   userId?: number
   goalSelection?: GoalOptionsType
   goalWeight?: number
@@ -62,12 +61,12 @@ export type GoalType = {
 }
 
 export type ProgressType = {
-  id?: number
   userId?: number
   dateOfEntry?: Date
-  weightMetric?: number
-  weightImperial?: number
+  progressWeightMetric?: number
+  progressWeightImperial?: number
   calories?: number
+  bodyFatPercent?: number
 }
 
 export type LoginUserType = {
@@ -79,9 +78,9 @@ export type LoggedInUser = {
   id: number
   fullName: string
   email: string
-  // stats?: StatsType
-  // goal?: GoalType
-  // progress?: ProgressType
+  stats: StatsType[] | undefined
+  goal: GoalType[] | undefined
+  progress: ProgressType[] | undefined
 }
 
 export type LoginSuccess = {
@@ -93,24 +92,28 @@ export const NullUser: UserType = {
   id: 0,
   fullName: '',
   email: '',
-  stats: {
-    sex: 'M',
-    heightMetric: 0,
-    heightImperial: 0,
-    weightMetric: 0,
-    weightImperial: 0,
-    activityLevel: 1.2,
-    activityLevelLabel: 'Sedentary',
-  },
-  goal: {},
-  progress: {
-    weightMetric: 0,
-    weightImperial: 0,
-    calories: 0,
-  },
+  // stats: {
+  //   sex: 'M',
+  //   heightMetric: 0,
+  //   heightImperial: 0,
+  //   weightMetric: 0,
+  //   weightImperial: 0,
+  //   activityLevel: 1.2,
+  //   activityLevelLabel: 'Sedentary',
+  // },
+  // goal: {},
+  // progress: {
+  //   weightMetric: 0,
+  //   weightImperial: 0,
+  //   calories: 0,
+  // },
+  stats: undefined,
+  goal: undefined,
+  progress: undefined,
 }
 
 export const NullUserStats: StatsType = {
+  doB: new Date(),
   sex: 'M',
   heightMetric: 0,
   heightImperial: 0,

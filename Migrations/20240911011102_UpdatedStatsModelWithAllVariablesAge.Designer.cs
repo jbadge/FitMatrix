@@ -3,6 +3,7 @@ using System;
 using FitMatrix.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FitMatrix.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240911011102_UpdatedStatsModelWithAllVariablesAge")]
+    partial class UpdatedStatsModelWithAllVariablesAge
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +42,7 @@ namespace FitMatrix.Migrations
                     b.Property<double>("GoalRate")
                         .HasColumnType("double precision");
 
-                    b.Property<string>("GoalSelection")
+                    b.Property<string>("GoalType")
                         .HasColumnType("text");
 
                     b.Property<double>("GoalWeight")
@@ -72,14 +75,14 @@ namespace FitMatrix.Migrations
                     b.Property<DateTime>("DoE")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<double>("ProgressWeightImperial")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("ProgressWeightMetric")
-                        .HasColumnType("double precision");
-
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
+
+                    b.Property<double>("WeightImperial")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("WeightMetric")
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
@@ -99,9 +102,6 @@ namespace FitMatrix.Migrations
                     b.Property<double>("ActivityLevel")
                         .HasColumnType("double precision");
 
-                    b.Property<string>("ActivityLevelLabel")
-                        .HasColumnType("text");
-
                     b.Property<int>("Age")
                         .HasColumnType("integer");
 
@@ -111,23 +111,23 @@ namespace FitMatrix.Migrations
                     b.Property<DateTime>("DoB")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<double>("HeightImperial")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("HeightMetric")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("Sex")
                         .HasColumnType("text");
 
+                    b.Property<double>("StartingHeightImperial")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("StartingHeightMetric")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("StartingWeightImperial")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("StartingWeightMetric")
+                        .HasColumnType("double precision");
+
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
-
-                    b.Property<double>("WeightImperial")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("WeightMetric")
-                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 

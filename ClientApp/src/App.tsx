@@ -7,10 +7,12 @@ import SignedOutNav from './components/SignedOutNav'
 
 import { SignIn } from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
-import NewProgressEntry from './pages/NewProgressEntry'
+// import NewProgressEntry from './pages/Progress'
 
-import UserStats from './pages/UserStats'
+import UserStats from './pages/UserPage'
 import UserInfo from './pages/UserInfo'
+import Progress from './pages/Progress'
+import SignedOutTdee from './pages/SignedOutTdee'
 
 export function App() {
   return (
@@ -19,10 +21,12 @@ export function App() {
 
       <Routes>
         {/* NEED INFO BACK IN THERE BUT WANTED DEFAULT TO NPE */}
-        <Route path="/users/:id/info" element={<UserInfo />} />
-        <Route path="/new" element={<NewProgressEntry />} />
-        <Route path="/" element={<NewProgressEntry />} />
+        <Route path="/" element={<SignedOutTdee />} />
         <Route path="/users/:id" element={<UserStats />} />
+        <Route path="/users/:id/info" element={<UserInfo />} />
+        <Route path="/users/:id/Progress" element={<Progress />} />
+        {/* <Route path="/new" element={<NewProgressEntry />} /> */}
+
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
       </Routes>
