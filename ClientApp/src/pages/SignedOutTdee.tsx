@@ -475,7 +475,7 @@ const SignedOutTdee = () => {
           </p>
           <p className="form-input">
             <label htmlFor="height">
-              Height{unit === 'metric' ? ' (cm)' : ' (inch)'}:
+              Height{unit === 'metric' ? ' (cm)' : ' (in)'}:
             </label>
             <input
               type="number"
@@ -489,8 +489,7 @@ const SignedOutTdee = () => {
           </p>
           <p className="form-input">
             <label htmlFor="weight">
-              Weight
-              {unit === 'metric' ? ' (kg)' : ' (lbs)'}:
+              Weight{unit === 'metric' ? ' (kg)' : ' (lbs)'}:
             </label>
             <input
               type="number"

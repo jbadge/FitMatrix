@@ -1,3 +1,17 @@
 need help with the date for age (change m,d ,y to span)
 need user to stay signed in after signing up
 need help making 0.5 steps in lose fat with max being 10%
+
+Link goal date to goal rate so that choosing a target weight and date will set rate.
+  also will set date based on rate and goal weight
+
+
+  if weight and lose, if goalRate -> goalDate fills
+  if weight and lose, if goalDate -> goalRate fills.
+  if values do not work bc constraints, show error.
+
+//go look at useeffect for date loading to bday
+
+TO DO: (figured out with Greg)
+  **How much would you like to lose, or what is your goal weight?
+  ** put a lbs or kg on right of rate box to clarify what it is

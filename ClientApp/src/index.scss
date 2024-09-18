@@ -325,9 +325,6 @@ footer {
   right: 500px;
   transform: translateX(50%);
 }
-.date-picker-goal {
-  transform: translate(10%, -150%);
-}
 
 .form-input {
   display: block;
@@ -341,11 +338,41 @@ footer {
   }
 }
 
-.date-picker {
-  position: absolute;
-  top: 0;
-  right: 50;
-  transform: translateX(49%);
+.user-page .user-goals .goal-rate[type='number'] {
+  font-size: 14px;
+  width: 80px;
+}
+
+// .user-page .user-goals .goal-weight[type='number'] {
+//   font-size: 14px;
+//   width: 80px;
+//   margin-left: 45px;
+//   position: relative;
+//   top: 20px;
+// }
+
+.user-page .user-goals {
+  .goal-weight[type='number'] {
+    font-size: 14px;
+    width: 80px;
+    margin-left: 35px;
+    // position: relative;
+    // top: 20px;
+  }
+  .date-picker-goal {
+    position: absolute;
+    top: 10;
+    right: 50;
+    // transform: translateX(49%);
+    transform: translate(75%, -65%);
+  }
+  .date-picker-goal {
+    input[type='text'] {
+      border-radius: 2rem;
+      width: 150px;
+      text-align: center;
+    }
+  }
 }
 
 .slider-input {
@@ -402,7 +429,7 @@ footer {
       padding: 1rem;
       color: grey;
     }
-    .user-user-goals {
+    .user-goals {
       position: relative;
       padding-top: 3rem;
       font-size: 14px;

@@ -12,6 +12,8 @@ import {
 } from '../types/types'
 import 'react-datepicker/dist/react-datepicker.css'
 import DatePicker from 'react-datepicker'
+import { differenceInCalendarISOWeekYears, differenceInDays } from 'date-fns'
+import { HardDriveDownload } from 'lucide-react'
 
 async function submitStats(entry: StatsType) {
   console.log('stats entry: ', entry)
@@ -58,6 +60,7 @@ const UserInfo = () => {
   const { id } = useParams() as { id: string }
   const [errorMessage, setErrorMessage] = React.useState('')
   const [focusedField, setFocusedField] = useState('')
+  const [checked, setChecked] = useState(false)
 
   const [unit, setUnit] = useState('imperial')
 
@@ -71,7 +74,9 @@ const UserInfo = () => {
   const [height, setHeight] = useState(0)
   const [weight, setWeight] = useState(0)
   const [activityLevel, setActivityLevel] = useState(1.2)
-  const [activityLevelLabel, setActivityLevelLabel] = useState('Sedentary')
+  const [activityLevelLabel, setActivityLevelLabel] = useState('')
+  const [bodyFatPercent, setBodyFatPercent] = useState(0)
+
   const [statsInfo, setStatsInfo] = React.useState<StatsType>({
     userId: 0,
     sex: 'U',
@@ -84,8 +89,15 @@ const UserInfo = () => {
   })
 
   const [goalDate, setGoalDate] = useState(new Date())
+
+  const [goalRate, setGoalRate] = useState(0)
+  const [goalRateLose, setGoalRateLose] = useState(0)
+  const [goalRateGain, setGoalRateGain] = useState(0)
+  const [bmi, setBmi] = useState(0)
+  const [goalWeight, setGoalWeight] = useState(0)
   const [goalWeightLose, setGoalWeightLose] = useState(0)
   const [goalWeightGain, setGoalWeightGain] = useState(0)
+
   const [checkedGoals, setCheckedGoals] = useState<
     Record<GoalOptionsType, boolean>
   >({
@@ -93,47 +105,20 @@ const UserInfo = () => {
     gain: false,
     maintain: false,
   })
+
   const [goalInfo, setGoalInfo] = React.useState<GoalType>({
     userId: 0,
     goalSelection: 'maintain',
     goalWeight: 0,
     goalRate: 0,
     goalBfp: 0,
-    goalDate: new Date(),
   })
 
+  const maxRange = (weight * 0.01).toFixed(1)
   const convertWeightToImperial = (kg: number) => kg / 0.45359237
   const convertWeightToMetric = (lbs: number) => lbs * 0.45359237
   const convertHeightToImperial = (cm: number) => cm * 0.3937007874
   const convertHeightToMetric = (inch: number) => inch / 0.3937007874
-  const maxRange = (weight * 0.01).toFixed(1)
-
-  // Mutations
-  ////////////
-  // 1
-  const createStatsMutation = useMutation(
-    (statsInfo: StatsType) => submitStats(statsInfo),
-    {
-      onSuccess: function () {
-        console.log('Stats submitted successfully')
-      },
-      onError: function (error: APIError) {
-        setErrorMessage(Object.values(error.errors).join('. '))
-      },
-    }
-  )
-  // 2
-  const createGoalMutation = useMutation(
-    (goalInfo: GoalType) => submitGoal(goalInfo),
-    {
-      onSuccess: function () {
-        console.log('Goal submitted successfully')
-      },
-      onError: function (error: APIError) {
-        setErrorMessage(Object.values(error.errors).join('. '))
-      },
-    }
-  )
 
   // Display
   //////////
@@ -184,15 +169,42 @@ const UserInfo = () => {
     })
   }
 
+  // Mutations
+  ////////////
+  // 1
+  const createStatsMutation = useMutation(
+    (statsInfo: StatsType) => submitStats(statsInfo),
+    {
+      onSuccess: function () {
+        console.log('Stats submitted successfully')
+      },
+      onError: function (error: APIError) {
+        setErrorMessage(Object.values(error.errors).join('. '))
+      },
+    }
+  )
+  // 2
+  const createGoalMutation = useMutation(
+    (goalInfo: GoalType) => submitGoal(goalInfo),
+    {
+      onSuccess: function () {
+        console.log('Goal submitted successfully')
+      },
+      onError: function (error: APIError) {
+        setErrorMessage(Object.values(error.errors).join('. '))
+      },
+    }
+  )
+
   // Handlers
   ///////////
   const handleCheckboxChange = (goal: GoalOptionsType) => {
     let goalValue = 0
 
     if (goal === 'lose') {
-      goalValue = goalWeightLose
+      goalValue = goalRateLose
     } else if (goal === 'gain') {
-      goalValue = goalWeightGain
+      goalValue = goalRateGain
     } else {
       goalValue = 0
     }
@@ -206,7 +218,8 @@ const UserInfo = () => {
     setGoalInfo((prevGoal) => ({
       ...prevGoal,
       goalSelection: goal,
-      goalWeight: goalValue,
+      goalRate: goalValue,
+      // goalWeight: goalValue,
     }))
 
     handleInputChange({
@@ -218,10 +231,12 @@ const UserInfo = () => {
     } as React.ChangeEvent<HTMLInputElement>)
   }
 
+  // Makes sure generated Age dates are valid
   const isValidDate = (date: Date) => {
     return date instanceof Date && !isNaN(date.getTime())
   }
 
+  // Get user and load data if data is in db
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -255,11 +270,24 @@ const UserInfo = () => {
               userId: user.id,
             })
             setAge(stats.age || '')
+            setDateOfBirth(stats.doB)
+            if (stats.doB) {
+              const dob = new Date(stats.doB)
+              setMonth(dob.getMonth() + 1)
+              setDay(dob.getDate())
+              setYear(dob.getFullYear())
+            }
+
             setSex(stats.sex || '')
-            setHeight(stats.heightMetric || '')
-            setWeight(stats.weightMetric || '')
+            setHeight(stats.heightImperial || '')
+            setWeight(stats.weightImperial || '')
             setActivityLevelLabel(stats.activityLevelLabel || '')
+            setBodyFatPercent(stats.bodyFatPercent || '')
+            if (stats.bodyFatPercent !== 0) {
+              setChecked(true)
+            }
           }
+
           // Set goals
           if (goal) {
             delete goal.id
@@ -273,8 +301,8 @@ const UserInfo = () => {
               gain: goal.goalSelection === 'gain',
               maintain: goal.goalSelection === 'maintain',
             })
-            setGoalWeightLose(goal.goalWeight!)
-            setGoalWeightGain(goal.goalWeight!)
+            setGoalRateLose(goal.goalWeight!)
+            setGoalRateGain(goal.goalWeight!)
             setGoalDate(goal.goalDate!)
           }
         }
@@ -316,7 +344,7 @@ const UserInfo = () => {
   ) {
     const { name, value } = event.target
     const numericValue = parseFloat(value)
-
+    console.log(name)
     switch (name) {
       case 'age':
         setAge(numericValue as number)
@@ -324,25 +352,28 @@ const UserInfo = () => {
           ...prevStats,
           [name]: numericValue,
         }))
-        updateDateFromAge(numericValue)
         break
+
       case 'month':
         setMonth(numericValue)
         break
+
       case 'day':
         setDay(numericValue)
         break
+
       case 'year':
         setYear(numericValue)
         break
+
       case 'sex':
         setSex(value)
         setStatsInfo((prevStats) => ({
           ...prevStats,
           [name]: value as SexOptionsType,
         }))
-        console.log(goalInfo)
         break
+
       case 'height':
         if (unit === 'metric') {
           setHeight(numericValue)
@@ -360,6 +391,7 @@ const UserInfo = () => {
           }))
         }
         break
+
       case 'weight':
         if (unit === 'metric') {
           setWeight(numericValue)
@@ -377,6 +409,15 @@ const UserInfo = () => {
           }))
         }
         break
+
+      case 'bodyFatPercent':
+        setBodyFatPercent(numericValue)
+        setStatsInfo((prevStats) => ({
+          ...prevStats,
+          [name]: numericValue,
+        }))
+        break
+
       case 'activityLevelLabel':
         switch (value) {
           case 'Sedentary':
@@ -388,6 +429,7 @@ const UserInfo = () => {
               activityLevelLabel: value,
             }))
             break
+
           case 'Light':
             setActivityLevelLabel(value)
             setActivityLevel(1.425)
@@ -397,6 +439,7 @@ const UserInfo = () => {
               activityLevelLabel: value,
             }))
             break
+
           case 'Moderate':
             setActivityLevelLabel(value)
             setActivityLevel(1.55)
@@ -406,6 +449,7 @@ const UserInfo = () => {
               activityLevelLabel: value,
             }))
             break
+
           case 'Heavy':
             setActivityLevelLabel(value)
             setActivityLevel(1.75)
@@ -415,6 +459,7 @@ const UserInfo = () => {
               activityLevelLabel: value,
             }))
             break
+
           case 'Athlete':
             setActivityLevelLabel(value)
             setActivityLevel(1.9)
@@ -424,6 +469,7 @@ const UserInfo = () => {
               activityLevelLabel: value,
             }))
             break
+
           case 'None':
             setActivityLevelLabel(value)
             setActivityLevel(1)
@@ -435,21 +481,41 @@ const UserInfo = () => {
             break
         }
         break
+
       case 'lose':
-        setGoalWeightLose(numericValue)
+        // Rate
+        setGoalRateLose(numericValue)
+        setGoalRate(numericValue)
+        // Weight
+        setGoalWeight(calculateGoalWeight(numericValue))
+
+        // User
         setGoalInfo((prevGoal) => ({
           ...prevGoal,
           goalSelection: name,
           goalRate: numericValue,
         }))
         break
+
       case 'gain':
-        setGoalWeightGain(numericValue)
+        setGoalRateGain(numericValue)
+        setGoalRate(numericValue)
         setGoalInfo((prevGoal) => ({
           ...prevGoal,
           goalSelection: name,
           goalRate: numericValue,
         }))
+        break
+      case 'goalRateLose':
+        setGoalRateLose(numericValue)
+        setGoalRate(numericValue)
+        break
+      case 'goalRateGain':
+        setGoalRateGain(numericValue)
+        setGoalRate(numericValue)
+        break
+      case 'goalWeight':
+        setGoalWeight(numericValue)
         break
       default:
         break
@@ -462,10 +528,8 @@ const UserInfo = () => {
 
     console.log('statsInfo in submit: ', statsInfo)
     updateDateFromAge(age)
-    // setStatsInfo((prev) => ({
-    //   ...prev,
-    //   doB: dob,
-    // }))
+    // updateDateFromGoalRate
+
     try {
       await Promise.all([
         (statsInfo.userId = Number(id)),
@@ -480,89 +544,67 @@ const UserInfo = () => {
     }
   }
 
-  // const calculateAge = () => {
-  //   if (year.toString().length === 4) {
-  //     console.log('date at beginning: ', dateOfBirth)
-  //   }
+  const handleCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked)
+  }
 
-  //   // handle date field
-  //   // Needs to be written
+  const calculateGoalWeight = (goalRate: number): number => {
+    if (goalDate) {
+      const timeToGoal = calculateGoalRate(goalDate)
+      const rate = goalRate
+      const weight = timeToGoal / rate
+      setGoalWeight(weight)
+      return goalWeight
+    }
+    return 0
+  }
 
-  //   // Handle age input only
-  //   if (age && isFocused) {
-  //     const today = new Date()
-  //     const userDob = new Date(
-  //       today.getFullYear() - age,
-  //       today.getMonth(),
-  //       today.getDate()
-  //     )
+  const calculateDifferenceInDays = (): number => {
+    const today = new Date()
+    const differenceInTime = goalDate.getTime() - today.getTime()
+    const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24))
+    return differenceInDays
+  }
 
-  //     setDateOfBirth(userDob)
-  //     setStatsInfo((prev) => ({
-  //       ...prev,
-  //       doB: userDob,
-  //     }))
-  //     // setIsFocused(false)
-  //     // Handle month day year
-  //   } else if (
-  //     month !== 0 &&
-  //     day !== 0 &&
-  //     year !== 0 &&
-  //     year.toString().length === 4
-  //   ) {
-  //     const monthInt = month - 1
-  //     const dayInt = day
-  //     const yearInt = year
+  const calculateGoalRate = (goalDate: Date): number => {
+    const today = new Date()
+    if (isValidDate(today) && isValidDate(goalDate)) {
+      // const differenceInTime = goalDate.getTime() - today.getTime()
 
-  //     if (
-  //       monthInt >= 0 &&
-  //       monthInt < 12 &&
-  //       dayInt > 0 &&
-  //       dayInt <= 31 &&
-  //       yearInt > 0
-  //     ) {
-  //       // Validate day based on month and year (leap year handling is not included)
-  //       if (monthInt === 1 && dayInt > 29) {
-  //         // alert('February cannot have more than 29 days.')
-  //         return
-  //       }
-  //       if ([3, 5, 8, 10].includes(monthInt) && dayInt > 30) {
-  //         // alert('This month cannot have more than 30 days.')
-  //         return
-  //       }
+      if (goalDate < today) {
+        throw new Error('The provided date must be in the future.')
+      } else {
+        // const differenceInDays = Math.ceil(
+        // differenceInTime / (1000 * 3600 * 24)
+        // )
+        const differenceInDays = calculateDifferenceInDays()
+        const differenceInWeeks = differenceInDays / 7
+        const goalRate =
+          goalInfo.goalSelection === 'lose' ? goalRateLose : goalRateGain
 
-  //       const today = new Date()
-  //       const userDob = new Date(yearInt, monthInt, dayInt)
+        setGoalRate(goalRate)
 
-  //       if (userDob.getDate() === dayInt && userDob.getMonth() === monthInt) {
-  //         setDateOfBirth(userDob)
-  //         const todayYear = today.getFullYear()
-  //         const newDateYear = userDob.getFullYear()
-  //         console.log(todayYear, newDateYear)
-  //         const tempAge = todayYear - newDateYear
+        return differenceInWeeks
+      }
+    }
 
-  //         console.log(today.getFullYear())
-  //         console.log(userDob.getFullYear())
-  //         console.log('age: ', tempAge)
-  //         // console.log('newDate: ', userDob)
-  //         // console.log('today: ', dateOfBirth)
+    return 0
+  }
 
-  //         setAge(tempAge)
-  //         setDateOfBirth(userDob)
-  //         setStatsInfo((prev) => ({
-  //           ...prev,
-  //           age: tempAge,
-  //           doB: userDob,
-  //         }))
-  //         // alert(`Date is set to: ${newDate.toDateString()}`)
-  //       } else {
-  //         alert('Invalid date')
-  //       }
-  //     } else {
-  //       alert('Invalid input')
-  //     }
-  //   }
-  // }
+  const updateWeightFromDate = (goalDate: Date) => {
+    const today = new Date()
+    console.log('here')
+    if (isValidDate(today)) {
+      const differenceInDays = calculateGoalRate(goalDate)
+      // returns 15 days
+
+      console.log('goalRate: ', goalRate)
+      const totalAmount = goalRate * differenceInDays
+      console.log(totalAmount)
+    } else {
+      console.log('not valid')
+    }
+  }
 
   const calculateAge = (dob: Date): number => {
     const today = new Date()
@@ -587,15 +629,13 @@ const UserInfo = () => {
       today.getMonth(),
       today.getDate()
     )
-    console.log('today: ', today)
-    console.log('userDob: ', userDob)
+
     if (isValidDate(userDob)) {
       setDateOfBirth(userDob)
-      //     setStatsInfo((prev) => ({
-      //       ...prev,
-      //       doB: userDob,
-      //     }))
-      setStatsInfo((prev) => ({ ...prev, doB: userDob }))
+      setStatsInfo((prev) => ({
+        ...prev,
+        doB: userDob,
+      }))
 
       setMonth(userDob.getMonth() + 1)
       setDay(userDob.getDate())
@@ -613,22 +653,71 @@ const UserInfo = () => {
   }
 
   // Handlers to update focus state
-
   const handleFocus = (field: string) => {
     setFocusedField(field)
   }
 
-  function handleBlur() {
+  function handleBlurDob() {
     if (month && day && year && year.toString().length === 4) {
       const dob = new Date(year, month - 1, day)
 
       if (isValidDate(dob)) {
         setDateOfBirth(dob)
         setAge(calculateAge(dob))
+        setStatsInfo((prev) => ({
+          ...prev,
+          doB: dob,
+        }))
       }
     }
   }
 
+  function handleBlurGoalDate() {
+    if (month && day && year && year.toString().length === 4) {
+      const goalDate = new Date(year, month - 1, day)
+
+      if (isValidDate(goalDate)) {
+        setGoalDate(goalDate)
+        setGoalRate(goalRate)
+        setGoalWeight(calculateGoalRate(goalDate))
+        setStatsInfo((prev) => ({
+          ...prev,
+          goalWeight: goalWeight,
+          goalRate: goalRate,
+          goalDate: goalDate,
+        }))
+      }
+    }
+  }
+
+  // const calculateGoalRate = (): number => {
+  //   if (goalDate && goalWeight > 0) {
+  //     const today = new Date();
+  //     const differenceInDays = Math.ceil(
+  //       (goalDate.getTime() - today.getTime()) / (1000 * 3600 * 24)
+  //     );
+
+  //     if (differenceInDays <= 0) {
+  //       throw new Error('The goal date must be in the future.');
+  //     }
+
+  //     return goalWeight / differenceInDays;
+  //   }
+
+  //   return goalRate;
+  // };
+
+  const validateGoalWeight = (weight: number) => {
+    // const bmi = weight! / Math.pow(heightMetric! / 100, 2)
+    // setBmi(bmi)
+    // if (bmi )
+    if (weight <= 0 || weight > weight * 0.75) {
+      throw new Error(`Goal weight must be between 1 and ${weight * 0.75} lbs.`)
+    }
+    setGoalWeight(weight)
+  }
+
+  // Handle mouse clicks outside Age, Month, Day, Year, DoB date
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -667,31 +756,28 @@ const UserInfo = () => {
               value={age || ''}
               onChange={handleInputChange}
               onFocus={() => handleFocus('age')}
-              onBlur={handleBlur}
+              onBlur={handleBlurDob}
             />
             {focusedField !== '' && (
               <>
                 <div className="date-picker-age">
-                  {/* <Calendar
-                    captionLayout="dropdown"
-                    fromYear={1920}
-                    toYear={2020}
-                  /> */}
                   <DatePicker
                     selected={dateOfBirth}
                     onChange={(date) => {
                       if (date) {
                         setDateOfBirth(date)
                         updateAgeFromDate(date)
+                        setMonth(date.getMonth() + 1)
+                        setDay(date.getDate())
+                        setYear(date.getFullYear())
                         setStatsInfo((prev) => ({
                           ...prev,
                           doB: date,
-                          sex: 'F',
                         }))
                       }
                     }}
                     onFocus={() => handleFocus('dob')}
-                    onBlur={handleBlur}
+                    onBlur={handleBlurDob}
                   />
                 </div>
                 <div className="month-day-year">
@@ -705,7 +791,7 @@ const UserInfo = () => {
                       value={month || ''}
                       onChange={handleInputChange}
                       onFocus={() => handleFocus('month')}
-                      onBlur={handleBlur}
+                      onBlur={handleBlurDob}
                     />
                   </span>
                   <span>
@@ -718,7 +804,7 @@ const UserInfo = () => {
                       value={day || ''}
                       onChange={handleInputChange}
                       onFocus={() => handleFocus('day')}
-                      onBlur={handleBlur}
+                      onBlur={handleBlurDob}
                     />
                   </span>
                   <span>
@@ -731,7 +817,7 @@ const UserInfo = () => {
                       value={year || ''}
                       onChange={handleInputChange}
                       onFocus={() => handleFocus('year')}
-                      onBlur={handleBlur}
+                      onBlur={handleBlurDob}
                     />
                   </span>
                 </div>
@@ -747,7 +833,9 @@ const UserInfo = () => {
             </select>
           </div>
           <div className="form-input">
-            <label htmlFor="height">Height: </label>
+            <label htmlFor="height">
+              Height{unit === 'metric' ? ' (cm)' : ' (in)'}:
+            </label>
             <input
               type="number"
               className="form-control"
@@ -759,7 +847,9 @@ const UserInfo = () => {
             />
           </div>
           <div className="form-input">
-            <label htmlFor="weight">Weight {}: </label>
+            <label htmlFor="weight">
+              Weight{unit === 'metric' ? ' (kg)' : ' (lbs)'}:
+            </label>
             <input
               type="number"
               className="form-control"
@@ -784,7 +874,7 @@ const UserInfo = () => {
               <option value="Athlete">Athlete</option>
             </select>
           </div>
-          <div className="user-user-goals">
+          <div className="user-goals">
             <div className="goal-heading">
               What goal would you like to achieve?
             </div>
@@ -802,26 +892,50 @@ const UserInfo = () => {
               {checkedGoals.lose ? (
                 <div className="input-container">
                   <input
+                    className="goal-rate"
                     type="number"
+                    // name="goalRateLose"
                     name="lose"
-                    placeholder="lbs"
-                    value={goalWeightLose}
+                    placeholder="lbs per week"
+                    value={goalRateLose}
                     onChange={handleInputChange}
                   />
-                  <div className="date-picker">
+                  {unit === 'imperial' ? 'lbs' : 'kg'}
+                  <div className="date-picker-goal">
                     {/* Is janky, needs fixing. it re-renders upon clicking date */}
+                    <input
+                      className="goal-weight"
+                      type="number"
+                      name="goalWeight"
+                      placeholder="Goal Weight"
+                      value={goalWeight || ''}
+                      onChange={handleInputChange}
+                    />
                     <DatePicker
                       selected={goalDate}
-                      className="date-picker-goal"
                       onChange={(date) => {
-                        if (date !== null) {
+                        // onChange={(date) => {
+                        //   if (date) {
+                        //     setDateOfBirth(date)
+                        //     updateAgeFromDate(date)
+                        //     setMonth(date.getMonth() + 1)
+                        //     setDay(date.getDate())
+                        //     setYear(date.getFullYear())
+                        //     setStatsInfo((prev) => ({
+                        //       ...prev,
+                        //       doB: date,
+                        //     }))
+                        //   }
+                        // }
+                        if (date) {
                           setGoalDate(date)
+                          updateWeightFromDate(date)
+                          setGoalInfo((prev) => ({
+                            ...prev,
+                            goalDate: date!,
+                          }))
+                          handleCheckboxChange('lose')
                         }
-                        setGoalInfo((prev) => ({
-                          ...prev,
-                          goalDate: date!,
-                        }))
-                        handleCheckboxChange('lose')
                       }}
                     />
                   </div>
@@ -832,8 +946,9 @@ const UserInfo = () => {
                     max={maxRange}
                     step="0.1"
                     className="slider-input"
-                    value={goalWeightLose}
-                    onChange={(event) => handleInputChange(event)}
+                    value={goalRateLose}
+                    onChange={handleInputChange}
+                    onBlur={handleBlurGoalDate}
                   />
                 </div>
               ) : (
@@ -856,12 +971,12 @@ const UserInfo = () => {
                 <div className="input-container">
                   <input
                     type="number"
-                    name="gain"
+                    name="goalWeightGain"
                     placeholder="lbs"
-                    value={goalWeightGain}
+                    value={goalRateGain}
                     onChange={handleInputChange}
                   />
-                  <div className="date-picker">
+                  <div className="date-picker-goal">
                     <DatePicker
                       selected={goalDate}
                       onChange={(date) => {
@@ -883,7 +998,7 @@ const UserInfo = () => {
                     max="2"
                     step="0.5"
                     className="slider-input"
-                    value={goalWeightGain}
+                    value={goalRateGain}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -908,6 +1023,45 @@ const UserInfo = () => {
                 />
                 Maintain
               </div>
+            </label>
+          </div>
+          <div className="optional">
+            <p className="optional-heading">Optional: </p>
+            <label>
+              <div className="label-container">
+                <input
+                  type="checkbox"
+                  name="bodyFatPercent"
+                  checked={checked}
+                  onChange={handleCheck}
+                />
+                Body Fat Percentage:
+              </div>
+              {checked ? (
+                <div className="input-container">
+                  <input
+                    type="number"
+                    // Max could be increased, potentially
+                    max={50}
+                    name="bodyFatPercent"
+                    placeholder="%"
+                    value={bodyFatPercent || ''}
+                    onChange={handleInputChange}
+                  />
+                  <input
+                    type="range"
+                    name="bodyFatPercent"
+                    min="0"
+                    max="50"
+                    step="1"
+                    className="slider-input"
+                    value={bodyFatPercent}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              ) : (
+                <div className="bodyFatPercent-placeholder"></div>
+              )}
             </label>
           </div>
           <div>
