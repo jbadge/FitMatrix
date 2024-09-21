@@ -1,59 +1,59 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import { Link, useParams } from 'react-router-dom'
 // import { NullUser, NullUserStats, UserStatsType } from '../types/types'
 // import { useQuery } from 'react-query'
-import { getUser } from '../types/auth'
-import { NullUserStats, StatsType } from '../types/types'
-import { useQuery } from 'react-query'
+// import { getUser } from '../types/auth'
+// import { NullUserStats, StatsType } from '../types/types'
+// import { useQuery } from 'react-query'
 
-async function loadUserStats(id: string) {
-  const response = await fetch(`/api/Users/${id}`)
+// async function loadUserStats(id: string) {
+//   const response = await fetch(`/api/Users/${id}`)
 
-  if (response.ok) {
-    return response.json()
-  } else {
-    throw await response.json()
-  }
-}
+//   if (response.ok) {
+//     return response.json()
+//   } else {
+//     throw await response.json()
+//   }
+// }
 
 const UserPage = () => {
-  const user = getUser()
+  // const user = getUser()
   // console.log(user)
   const { id } = useParams() as { id: string }
-  const [unit, setUnit] = useState('imperial')
+  // const [unit, setUnit] = useState('imperial')
 
-  const {
-    // refetch: reloadUser,
-    data: userStats = NullUserStats,
-  } = useQuery<StatsType>(['user-stats', id], () => loadUserStats(id))
+  // const {
+  //   // refetch: reloadUser,
+  //   data: userStats = NullUserStats,
+  // } = useQuery<StatsType>(['user-stats', id], () => loadUserStats(id))
 
-  const toggleUnit = () => {
-    setUnit((prevUnit) => {
-      const newUnit = prevUnit === 'metric' ? 'imperial' : 'metric'
+  // const toggleUnit = () => {
+  //   setUnit((prevUnit) => {
+  //     const newUnit = prevUnit === 'metric' ? 'imperial' : 'metric'
 
-      // setProgress((prevInput) => {
-      //   const newWeightMetric =
-      //     newUnit === 'metric'
-      //       ? prevInput.weightMetric!
-      //       : convertToMetric(prevInput.weightImperial!)
-      //   const newWeightImperial =
-      //     newUnit === 'imperial'
-      //       ? prevInput.weightImperial!
-      //       : convertToImperial(prevInput.weightMetric!)
-      //   const date = new Date()
-      //   setWeight(newUnit === 'metric' ? newWeightMetric : newWeightImperial)
+  //     // setProgress((prevInput) => {
+  //     //   const newWeightMetric =
+  //     //     newUnit === 'metric'
+  //     //       ? prevInput.weightMetric!
+  //     //       : convertToMetric(prevInput.weightImperial!)
+  //     //   const newWeightImperial =
+  //     //     newUnit === 'imperial'
+  //     //       ? prevInput.weightImperial!
+  //     //       : convertToImperial(prevInput.weightMetric!)
+  //     //   const date = new Date()
+  //     //   setWeight(newUnit === 'metric' ? newWeightMetric : newWeightImperial)
 
-      //   return {
-      //     dateOfEntry: date,
-      //     weightMetric: newWeightMetric,
-      //     weightImperial: newWeightImperial,
-      //     calories: calories,
-      //   }
-      // })
-      return newUnit
-    })
-  }
+  //     //   return {
+  //     //     dateOfEntry: date,
+  //     //     weightMetric: newWeightMetric,
+  //     //     weightImperial: newWeightImperial,
+  //     //     calories: calories,
+  //     //   }
+  //     // })
+  //     return newUnit
+  //   })
+  // }
 
   // const createNewReview = useMutation(submitNewReview, {
   //   onSuccess: function () {

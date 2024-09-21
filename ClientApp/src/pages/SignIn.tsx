@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { APIError, LoginSuccess, LoginUserType } from '../types/types'
 import { useMutation } from 'react-query'
-import { getUser, getUserId, recordAuthentication } from '../types/auth'
-import { useParams } from 'react-router-dom'
+import { recordAuthentication } from '../types/auth'
 
 async function loginUser(user: LoginUserType): Promise<LoginSuccess> {
   const response = await fetch('/api/Sessions', {
@@ -20,8 +19,7 @@ async function loginUser(user: LoginUserType): Promise<LoginSuccess> {
 
 export function SignIn() {
   const [errorMessage, setErrorMessage] = React.useState('')
-  const { id } = useParams() as { id: string }
-  // const id = getUserId()
+  // const { id } = useParams() as { id: string }
 
   const [user, setUser] = React.useState<LoginUserType>({
     email: '',
@@ -56,10 +54,6 @@ export function SignIn() {
     loginUserMutation.mutate(user)
   }
 
-  useEffect(() => {
-    // const id = getUserId()
-    console.log(id)
-  }, [])
   return (
     <main className="user-page">
       <nav className="navbar-container">

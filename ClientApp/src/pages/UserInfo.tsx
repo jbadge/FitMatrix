@@ -72,7 +72,7 @@ const UserInfo = () => {
   const [sex, setSex] = useState('U')
   const [height, setHeight] = useState(0)
   const [weight, setWeight] = useState(0)
-  const [activityLevel, setActivityLevel] = useState(1.2)
+  const [activityLevel, setActivityLevel] = useState(1.2) // get rid of?
   const [activityLevelLabel, setActivityLevelLabel] = useState('')
   const [bodyFatPercent, setBodyFatPercent] = useState(0)
 
@@ -92,11 +92,11 @@ const UserInfo = () => {
   const [goalRate, setGoalRate] = useState(0)
   const [goalRateLose, setGoalRateLose] = useState(0)
   const [goalRateGain, setGoalRateGain] = useState(0)
-  const [bmi, setBmi] = useState(0)
+  // const [bmi, setBmi] = useState(0)
   const [effectiveWeight, setEffectiveWeight] = useState(0)
   const [goalWeight, setGoalWeight] = useState(0)
-  const [goalWeightLose, setGoalWeightLose] = useState(0)
-  const [goalWeightGain, setGoalWeightGain] = useState(0)
+  // const [goalWeightLose, setGoalWeightLose] = useState(0)
+  // const [goalWeightGain, setGoalWeightGain] = useState(0)
 
   const [checkedGoals, setCheckedGoals] = useState<
     Record<GoalOptionsType, boolean>
@@ -113,7 +113,7 @@ const UserInfo = () => {
     goalRate: 0,
     goalBfp: 0,
   })
-  const roundToOneDecimal = (num: number) => Math.round(num * 100) / 100
+  // const roundToOneDecimal = (num: number) => Math.round(num * 100) / 100
   // const maxRange = Math.ceil(weight * 0.01 * 10) / 10
 
   const maxRange = weight * 0.01 // e.g., 1.9
@@ -128,7 +128,7 @@ const UserInfo = () => {
 
   useEffect(() => {
     setEffectiveWeight(minLoseWeight)
-
+    console.log(activityLevel)
     console.log('Weight:', weight)
     console.log('Max Range:', maxRange)
     console.log('Effective Loss:', effectiveLoss)
@@ -151,9 +151,9 @@ const UserInfo = () => {
   const displayGoalWeightValue = Number(goalWeight.toFixed(1))
   // stores 1.82, shows 1.8
 
-  const displayedGoalWeight = displayGoalWeightValue
-    ? roundToOneDecimal(displayGoalWeightValue)
-    : ''
+  // const displayedGoalWeight = displayGoalWeightValue
+  //   ? roundToOneDecimal(displayGoalWeightValue)
+  //   : ''
   // const isValid =
   // displayGoalWeightValue >= minLoseWeight && displayGoalWeightValue <= weight
   // console.log('Is valid:', isValid) // Should indicate if the input is valid
@@ -287,16 +287,16 @@ const UserInfo = () => {
     return date instanceof Date && !isNaN(date.getTime())
   }
 
-  const isValidWeight = (): number => {
-    if (goalWeight < weight * 0.99) {
-      setGoalWeight(Number((weight * 0.99).toFixed(1)))
-      return weight * 0.99
-    } else if (goalWeight > weight) {
-      setGoalWeight(Number(weight.toFixed(1)))
-      return weight
-    }
-    return goalWeight
-  }
+  // const isValidWeight = (): number => {
+  //   if (goalWeight < weight * 0.99) {
+  //     setGoalWeight(Number((weight * 0.99).toFixed(1)))
+  //     return weight * 0.99
+  //   } else if (goalWeight > weight) {
+  //     setGoalWeight(Number(weight.toFixed(1)))
+  //     return weight
+  //   }
+  //   return goalWeight
+  // }
 
   // Handle Inputs
   function handleInputChange(
