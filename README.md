@@ -1,3 +1,3 @@
 # FitMatrix
 
-deployed: https://fit-matrix-pun3x17zj-jbadges-projects.vercel.app/
+deployed: https://fit-matrix-nrjdpmu3d-jbadges-projects.vercel.app/
