@@ -469,6 +469,7 @@ const SignedOutTdee = () => {
           <p className="form-input">
             <label htmlFor="sex">Sex: </label>
             <select name="sex" value={sex || ''} onChange={handleInputChange}>
+              <option value="Select">Select</option>
               <option value="M">M</option>
               <option value="F">F</option>
             </select>
