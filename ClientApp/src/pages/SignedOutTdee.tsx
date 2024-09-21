@@ -29,7 +29,7 @@ const SignedOutTdee = () => {
   const [bmiBfp, setBmiBfp] = useState(0)
   const [bmi, setBmi] = useState(0)
   const [statsInfo, setStatsInfo] = React.useState<StatsType>({
-    sex: 'M',
+    sex: 'U',
     heightMetric: 0,
     heightImperial: 0,
     weightMetric: 0,
