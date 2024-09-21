@@ -72,7 +72,7 @@ const UserInfo = () => {
   const [sex, setSex] = useState('U')
   const [height, setHeight] = useState(0)
   const [weight, setWeight] = useState(0)
-  const [activityLevel, setActivityLevel] = useState(1.2) // get rid of?
+  // const [activityLevel, setActivityLevel] = useState(1.2) // get rid of?
   const [activityLevelLabel, setActivityLevelLabel] = useState('')
   const [bodyFatPercent, setBodyFatPercent] = useState(0)
 
@@ -93,7 +93,7 @@ const UserInfo = () => {
   const [goalRateLose, setGoalRateLose] = useState(0)
   const [goalRateGain, setGoalRateGain] = useState(0)
   // const [bmi, setBmi] = useState(0)
-  const [effectiveWeight, setEffectiveWeight] = useState(0)
+  // const [effectiveWeight, setEffectiveWeight] = useState(0)
   const [goalWeight, setGoalWeight] = useState(0)
   // const [goalWeightLose, setGoalWeightLose] = useState(0)
   // const [goalWeightGain, setGoalWeightGain] = useState(0)
@@ -126,16 +126,16 @@ const UserInfo = () => {
   console.log('minimum of goal weight: ', minLoseWeight)
   // console.log('range must be ', minLoseWeight + ' - ', minLoseWeight + 0.1)
 
-  useEffect(() => {
-    setEffectiveWeight(minLoseWeight)
-    console.log(activityLevel)
-    console.log('Weight:', weight)
-    console.log('Max Range:', maxRange)
-    console.log('Effective Loss:', effectiveLoss)
-    console.log('Min Lose Weight:', minLoseWeight)
-    console.log('Effective Lose Weight:', effectiveWeight)
-    console.log('Display Goal Weight: ', displayGoalWeightValue)
-  }, [weight, maxRange, goalRate])
+  // useEffect(() => {
+  //   setEffectiveWeight(minLoseWeight)
+  //   console.log(activityLevel)
+  //   console.log('Weight:', weight)
+  //   console.log('Max Range:', maxRange)
+  //   console.log('Effective Loss:', effectiveLoss)
+  //   console.log('Min Lose Weight:', minLoseWeight)
+  //   console.log('Effective Lose Weight:', effectiveWeight)
+  //   console.log('Display Goal Weight: ', displayGoalWeightValue)
+  // }, [weight, maxRange, goalRate])
 
   const convertWeightToImperial = (kg: number) => kg / 0.45359237
   const convertWeightToMetric = (lbs: number) => lbs * 0.45359237
@@ -385,7 +385,7 @@ const UserInfo = () => {
         switch (value) {
           case 'Sedentary':
             setActivityLevelLabel(value)
-            setActivityLevel(1.2)
+            // setActivityLevel(1.2)
             setStatsInfo((prevStats) => ({
               ...prevStats,
               activityLevel: 1.2,
@@ -395,7 +395,7 @@ const UserInfo = () => {
 
           case 'Light':
             setActivityLevelLabel(value)
-            setActivityLevel(1.425)
+            // setActivityLevel(1.425)
             setStatsInfo((prevStats) => ({
               ...prevStats,
               activityLevel: 1.425,
@@ -405,7 +405,7 @@ const UserInfo = () => {
 
           case 'Moderate':
             setActivityLevelLabel(value)
-            setActivityLevel(1.55)
+            // setActivityLevel(1.55)
             setStatsInfo((prevStats) => ({
               ...prevStats,
               activityLevel: 1.55,
@@ -415,7 +415,7 @@ const UserInfo = () => {
 
           case 'Heavy':
             setActivityLevelLabel(value)
-            setActivityLevel(1.75)
+            // setActivityLevel(1.75)
             setStatsInfo((prevStats) => ({
               ...prevStats,
               activityLevel: 1.75,
@@ -425,7 +425,7 @@ const UserInfo = () => {
 
           case 'Athlete':
             setActivityLevelLabel(value)
-            setActivityLevel(1.9)
+            // setActivityLevel(1.9)
             setStatsInfo((prevStats) => ({
               ...prevStats,
               activityLevel: 1.9,
@@ -435,7 +435,7 @@ const UserInfo = () => {
 
           case 'None':
             setActivityLevelLabel(value)
-            setActivityLevel(1)
+            // setActivityLevel(1)
             setStatsInfo((prevStats) => ({
               ...prevStats,
               activityLevel: 1,
@@ -865,7 +865,7 @@ const UserInfo = () => {
             setHeight(stats.heightImperial || '')
             ///////////////
             setWeight(stats.weightImperial || '')
-            setActivityLevel(stats.activityLevel || '')
+            // setActivityLevel(stats.activityLevel || '')
             setActivityLevelLabel(stats.activityLevelLabel || '')
             setBodyFatPercent(stats.bodyFatPercent || '')
             if (stats.bodyFatPercent !== 0) {
