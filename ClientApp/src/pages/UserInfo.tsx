@@ -11,6 +11,7 @@ import {
   StatsType,
 } from '../types/types'
 import 'react-datepicker/dist/react-datepicker.css'
+import DatePicker from 'react-datepicker'
 
 async function submitStats(entry: StatsType) {
   console.log('stats entry: ', entry)
