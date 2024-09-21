@@ -23,7 +23,7 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 // disableReactDevTools()
 root.render(
   <React.StrictMode>
-    <Router basename="/">
+    <Router>
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
