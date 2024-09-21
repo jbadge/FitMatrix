@@ -351,6 +351,10 @@ footer {
 //   top: 20px;
 // }
 
+.date-picker-calendar {
+  z-index: 1000;
+}
+
 .user-page .user-goals {
   .goal-weight[type='number'] {
     font-size: 14px;
@@ -364,7 +368,8 @@ footer {
     top: 10;
     right: 50;
     // transform: translateX(49%);
-    transform: translate(75%, -65%);
+    transform: translate(85%, -65%);
+    z-index: 1000;
   }
   .date-picker-goal {
     input[type='text'] {
@@ -453,6 +458,7 @@ footer {
         justify-content: space-between;
         line-height: 32px;
         position: relative;
+        // z-index: -1000;
         .input-container {
           position: absolute;
           right: 0;

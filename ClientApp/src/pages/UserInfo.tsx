@@ -12,8 +12,6 @@ import {
 } from '../types/types'
 import 'react-datepicker/dist/react-datepicker.css'
 import DatePicker from 'react-datepicker'
-import { differenceInCalendarISOWeekYears, differenceInDays } from 'date-fns'
-import { HardDriveDownload } from 'lucide-react'
 
 async function submitStats(entry: StatsType) {
   console.log('stats entry: ', entry)
@@ -60,6 +58,7 @@ const UserInfo = () => {
   const { id } = useParams() as { id: string }
   const [errorMessage, setErrorMessage] = React.useState('')
   const [focusedField, setFocusedField] = useState('')
+  const [lastFocusedInput, setLastFocusedInput] = useState('')
   const [checked, setChecked] = useState(false)
 
   const [unit, setUnit] = useState('imperial')
@@ -94,6 +93,7 @@ const UserInfo = () => {
   const [goalRateLose, setGoalRateLose] = useState(0)
   const [goalRateGain, setGoalRateGain] = useState(0)
   const [bmi, setBmi] = useState(0)
+  const [effectiveWeight, setEffectiveWeight] = useState(0)
   const [goalWeight, setGoalWeight] = useState(0)
   const [goalWeightLose, setGoalWeightLose] = useState(0)
   const [goalWeightGain, setGoalWeightGain] = useState(0)
@@ -113,8 +113,30 @@ const UserInfo = () => {
     goalRate: 0,
     goalBfp: 0,
   })
+  const roundToOneDecimal = (num: number) => Math.round(num * 100) / 100
+  // const maxRange = Math.ceil(weight * 0.01 * 10) / 10
 
-  const maxRange = (weight * 0.01).toFixed(1)
+  const maxRange = weight * 0.01 // e.g., 1.9
+  const effectiveLoss = Number(
+    (maxRange * (calculateDifferenceInDays() / 7)).toFixed(1)
+  )
+  console.log('effective loss: ', effectiveLoss)
+  // const effectiveLoss = maxRange * goalRate
+  const minLoseWeight = Number((weight - effectiveLoss).toFixed(1))
+  console.log('minimum of goal weight: ', minLoseWeight)
+  // console.log('range must be ', minLoseWeight + ' - ', minLoseWeight + 0.1)
+
+  useEffect(() => {
+    setEffectiveWeight(minLoseWeight)
+
+    console.log('Weight:', weight)
+    console.log('Max Range:', maxRange)
+    console.log('Effective Loss:', effectiveLoss)
+    console.log('Min Lose Weight:', minLoseWeight)
+    console.log('Effective Lose Weight:', effectiveWeight)
+    console.log('Display Goal Weight: ', displayGoalWeightValue)
+  }, [weight, maxRange, goalRate])
+
   const convertWeightToImperial = (kg: number) => kg / 0.45359237
   const convertWeightToMetric = (lbs: number) => lbs * 0.45359237
   const convertHeightToImperial = (cm: number) => cm * 0.3937007874
@@ -122,19 +144,48 @@ const UserInfo = () => {
 
   // Display
   //////////
-  const displayHeightValue =
-    unit === 'metric'
-      ? Math.round(height * 100) / 100
-      : Math.round(height * 100) / 100
+  const displayHeightValue = Math.round(height * 10) / 10
 
-  const displayWeightValue =
-    unit === 'metric'
-      ? Math.round(weight * 100) / 100
-      : Math.round(weight * 100) / 100
+  const displayWeightValue = Math.round(weight * 10) / 10
+
+  const displayGoalWeightValue = Number(goalWeight.toFixed(1))
+  // stores 1.82, shows 1.8
+
+  const displayedGoalWeight = displayGoalWeightValue
+    ? roundToOneDecimal(displayGoalWeightValue)
+    : ''
+  // const isValid =
+  // displayGoalWeightValue >= minLoseWeight && displayGoalWeightValue <= weight
+  // console.log('Is valid:', isValid) // Should indicate if the input is valid
 
   const toggleUnit = () => {
     setUnit((prevUnit) => {
       const newUnit = prevUnit === 'metric' ? 'imperial' : 'metric'
+
+      setGoalInfo((prev) => {
+        const newGoalWeightMetric =
+          newUnit === 'metric'
+            ? convertWeightToMetric(prev.goalWeight!)
+            : prev.goalWeight!
+
+        const newGoalWeightImperial =
+          newUnit === 'metric'
+            ? prev.goalWeight!
+            : convertWeightToImperial(prev.goalWeight!)
+        // ...prev,
+        // goalWeight:
+        //   newUnit === 'metric'
+        //     ? convertWeightToMetric(displayGoalWeightValue)
+        //     : displayGoalWeightValue,
+        setGoalWeight(
+          newUnit === 'metric' ? newGoalWeightMetric : newGoalWeightImperial
+        )
+        return {
+          ...prev,
+          goalWeight:
+            newUnit === 'metric' ? newGoalWeightMetric : newGoalWeightImperial,
+        }
+      })
 
       setStatsInfo((prev) => {
         const newHeightMetric =
@@ -236,105 +287,16 @@ const UserInfo = () => {
     return date instanceof Date && !isNaN(date.getTime())
   }
 
-  // Get user and load data if data is in db
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(`/api/Users/${id}`, {
-          headers: {
-            Authorization: authHeader(),
-          },
-        })
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const user = await response.json()
-
-        if (user) {
-          const stats =
-            user.stats && user.stats.length > 0
-              ? user.stats[user.stats.length - 1]
-              : undefined
-          const goal =
-            user.goal && user.goal.length > 0
-              ? user.goal[user.goal.length - 1]
-              : undefined
-
-          /// Need to implement correctly
-          // Set stats
-          if (stats) {
-            delete stats.id
-            // console.log(stats)
-            setStatsInfo({
-              ...stats,
-              userId: user.id,
-            })
-            setAge(stats.age || '')
-            setDateOfBirth(stats.doB)
-            if (stats.doB) {
-              const dob = new Date(stats.doB)
-              setMonth(dob.getMonth() + 1)
-              setDay(dob.getDate())
-              setYear(dob.getFullYear())
-            }
-
-            setSex(stats.sex || '')
-            setHeight(stats.heightImperial || '')
-            setWeight(stats.weightImperial || '')
-            setActivityLevelLabel(stats.activityLevelLabel || '')
-            setBodyFatPercent(stats.bodyFatPercent || '')
-            if (stats.bodyFatPercent !== 0) {
-              setChecked(true)
-            }
-          }
-
-          // Set goals
-          if (goal) {
-            delete goal.id
-            setGoalInfo({
-              ...goal,
-              userId: user.id,
-            })
-
-            setCheckedGoals({
-              lose: goal.goalSelection === 'lose',
-              gain: goal.goalSelection === 'gain',
-              maintain: goal.goalSelection === 'maintain',
-            })
-            setGoalRateLose(goal.goalWeight!)
-            setGoalRateGain(goal.goalWeight!)
-            setGoalDate(goal.goalDate!)
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error)
-      }
+  const isValidWeight = (): number => {
+    if (goalWeight < weight * 0.99) {
+      setGoalWeight(Number((weight * 0.99).toFixed(1)))
+      return weight * 0.99
+    } else if (goalWeight > weight) {
+      setGoalWeight(Number(weight.toFixed(1)))
+      return weight
     }
-    fetchUserData()
-  }, [])
-
-  // USE EFFECT TO SPEED UP TESTING
-  useEffect(() => {
-    setStatsInfo((prev) => ({
-      ...prev,
-      age: age,
-      sex: prev.sex,
-      weightImperial: weight,
-      weightMetric: convertWeightToMetric(weight),
-      heightImperial: height,
-      heightMetric: convertHeightToMetric(height),
-      activityLevel: activityLevel,
-      activityLevelLabel: prev.activityLevelLabel,
-    }))
-    setGoalInfo((prev) => ({
-      ...prev,
-      goalSelection: prev.goalSelection,
-      goalWeight: prev.goalWeight,
-      goalRate: prev.goalRate,
-      goalBfp: prev.goalBfp,
-      goalDate: prev.goalDate,
-    }))
-  }, [])
+    return goalWeight
+  }
 
   // Handle Inputs
   function handleInputChange(
@@ -344,7 +306,8 @@ const UserInfo = () => {
   ) {
     const { name, value } = event.target
     const numericValue = parseFloat(value)
-    console.log(name)
+    console.log('name: ', name)
+    console.log('value: ', value)
     switch (name) {
       case 'age':
         setAge(numericValue as number)
@@ -488,6 +451,7 @@ const UserInfo = () => {
         setGoalRate(numericValue)
         // Weight
         setGoalWeight(calculateGoalWeight(numericValue))
+        // setGoalWeight(roundToOneDecimal(calculateGoalWeight(numericValue)))
 
         // User
         setGoalInfo((prevGoal) => ({
@@ -495,6 +459,8 @@ const UserInfo = () => {
           goalSelection: name,
           goalRate: numericValue,
         }))
+
+        setLastFocusedInput('lose')
         break
 
       case 'gain':
@@ -506,17 +472,31 @@ const UserInfo = () => {
           goalRate: numericValue,
         }))
         break
-      case 'goalRateLose':
-        setGoalRateLose(numericValue)
-        setGoalRate(numericValue)
-        break
-      case 'goalRateGain':
-        setGoalRateGain(numericValue)
-        setGoalRate(numericValue)
-        break
-      case 'goalWeight':
+
+      // case 'goalRateLose':
+      //   setGoalRateLose(numericValue)
+      //   setGoalRate(numericValue)
+      //   break
+
+      // case 'goalRateGain':
+      //   setGoalRateGain(numericValue)
+      //   setGoalRate(numericValue)
+      //   break
+
+      case 'goalWeightLose':
         setGoalWeight(numericValue)
+        setGoalRate(calculateGoalRateFromWeight(numericValue))
+        setGoalRateLose(calculateGoalRateFromWeight(numericValue))
+        setGoalInfo((prevGoal) => ({
+          ...prevGoal,
+          // goalSelection: name,
+          goalRate: goalRate,
+        }))
+        console.log('minLoseWeight: ', minLoseWeight)
+        setLastFocusedInput('goalWeightLose')
+
         break
+
       default:
         break
     }
@@ -550,38 +530,66 @@ const UserInfo = () => {
 
   const calculateGoalWeight = (goalRate: number): number => {
     if (goalDate) {
-      const timeToGoal = calculateGoalRate(goalDate)
+      const parseGoalDate = new Date(goalDate)
+      const weeksToTargetDate = calculateGoalRateFromDate(parseGoalDate)
       const rate = goalRate
-      const weight = timeToGoal / rate
-      setGoalWeight(weight)
-      return goalWeight
+      const targetWeight = Number(
+        (weight - weeksToTargetDate * rate).toFixed(1)
+      )
+      console.log('goalDate: ', goalDate)
+      console.log('targetWeight: ', targetWeight)
+      console.log('rate: ', rate)
+      console.log('weeksToTargetDate: ', weeksToTargetDate)
+      setGoalWeight(targetWeight)
+      setGoalInfo((prev) => ({
+        ...prev,
+        goalWeight: targetWeight,
+      }))
+      console.log('targetWeight: ', targetWeight)
+      return targetWeight
     }
     return 0
   }
 
-  const calculateDifferenceInDays = (): number => {
-    const today = new Date()
-    const differenceInTime = goalDate.getTime() - today.getTime()
-    const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24))
-    return differenceInDays
+  function calculateDifferenceInDays(): number {
+    const parsedGoalDate = new Date(goalDate)
+
+    if (!isNaN(parsedGoalDate.getTime())) {
+      console.log(parsedGoalDate)
+
+      const today = new Date()
+      const utc1 = Date.UTC(
+        parsedGoalDate.getFullYear(),
+        parsedGoalDate.getMonth(),
+        parsedGoalDate.getDate()
+      )
+      const utc2 = Date.UTC(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      )
+      const differenceInDays = Math.floor((utc1 - utc2) / (1000 * 60 * 60 * 24))
+      console.log('difference in days from goal to now: ', differenceInDays)
+      console.log(
+        'based on this, the difference in weeks from then to now is: ',
+        differenceInDays / 7
+      )
+      return differenceInDays
+    }
+    return 0
   }
 
-  const calculateGoalRate = (goalDate: Date): number => {
+  const calculateGoalRateFromDate = (goalDate: Date): number => {
     const today = new Date()
-    if (isValidDate(today) && isValidDate(goalDate)) {
-      // const differenceInTime = goalDate.getTime() - today.getTime()
-
-      if (goalDate < today) {
-        throw new Error('The provided date must be in the future.')
-      } else {
-        // const differenceInDays = Math.ceil(
-        // differenceInTime / (1000 * 3600 * 24)
-        // )
+    if (isValidDate(goalDate)) {
+      if (goalDate > today) {
         const differenceInDays = calculateDifferenceInDays()
         const differenceInWeeks = differenceInDays / 7
         const goalRate =
           goalInfo.goalSelection === 'lose' ? goalRateLose : goalRateGain
-
+        console.log('differenceInDays: ', differenceInDays)
+        console.log('differenceInWeeks: ', differenceInWeeks)
+        console.log('goalRate: ', goalRate)
         setGoalRate(goalRate)
 
         return differenceInWeeks
@@ -591,16 +599,60 @@ const UserInfo = () => {
     return 0
   }
 
+  const calculateGoalRateFromWeight = (goalWeight: number): number => {
+    if (isValidDate(goalDate) && goalWeight > 0) {
+      const differenceInDays = calculateDifferenceInDays()
+
+      if (differenceInDays >= 0) {
+        const tempGoalRate = (weight - goalWeight) / (differenceInDays / 7)
+
+        // Put good error message in like window that says you have to have a name
+        if (tempGoalRate <= weight * 0.01) {
+          return tempGoalRate
+        }
+        return 0
+      } else {
+        // Put good error message in like window that says you have to have a name
+        throw new Error('The goal date must be in the future.')
+      }
+    }
+    console.log(goalRate)
+    return goalRate
+
+    //     const differenceInWeeks = differenceInDays / 7
+    //     const goalRate =
+    //       goalInfo.goalSelection === 'lose' ? goalRateLose : goalRateGain
+
+    //     setGoalRate(goalRate)
+
+    //     return differenceInWeeks
+    //   }
+    // }
+
+    // return 0
+  }
+
   const updateWeightFromDate = (goalDate: Date) => {
     const today = new Date()
-    console.log('here')
     if (isValidDate(today)) {
-      const differenceInDays = calculateGoalRate(goalDate)
-      // returns 15 days
+      let differenceInDays = 0
+      let totalAmount = 0
+      let targetWeight = 0
 
-      console.log('goalRate: ', goalRate)
-      const totalAmount = goalRate * differenceInDays
-      console.log(totalAmount)
+      if (goalWeight === 0) {
+        differenceInDays = calculateGoalRateFromDate(goalDate)
+        totalAmount = goalRate * differenceInDays
+        targetWeight = weight - totalAmount
+        console.log('targetWeight: ', targetWeight)
+      } else {
+        targetWeight = goalWeight
+      }
+
+      setGoalWeight(targetWeight)
+      setGoalInfo((prev) => ({
+        ...prev,
+        goalWeight: targetWeight,
+      }))
     } else {
       console.log('not valid')
     }
@@ -673,19 +725,66 @@ const UserInfo = () => {
   }
 
   function handleBlurGoalDate() {
-    if (month && day && year && year.toString().length === 4) {
-      const goalDate = new Date(year, month - 1, day)
+    if (isValidDate(goalDate)) {
+      console.log('focusedField: ', focusedField)
 
-      if (isValidDate(goalDate)) {
-        setGoalDate(goalDate)
-        setGoalRate(goalRate)
-        setGoalWeight(calculateGoalRate(goalDate))
-        setStatsInfo((prev) => ({
+      if (lastFocusedInput === 'lose') {
+        const daysToTargetWeight = calculateDifferenceInDays()
+        const weeksToTargetWeight = daysToTargetWeight / 7
+        const targetWeight = weight - goalRate * weeksToTargetWeight
+
+        setGoalWeight(targetWeight)
+        setGoalInfo((prev) => ({
           ...prev,
-          goalWeight: goalWeight,
           goalRate: goalRate,
-          goalDate: goalDate,
+          goalWeight: targetWeight,
         }))
+      } else if (lastFocusedInput === 'goalWeightLose') {
+        let differenceInDays = 0
+        let totalAmount = 0
+        let targetWeight = 0
+
+        if (goalWeight === 0) {
+          differenceInDays = calculateGoalRateFromDate(goalDate)
+          totalAmount = goalRate * differenceInDays
+          targetWeight = weight - totalAmount
+          console.log('targetWeight: ', targetWeight)
+        } else {
+          targetWeight = goalWeight
+        }
+
+        setGoalWeight(targetWeight)
+        setGoalInfo((prev) => ({
+          ...prev,
+          goalWeight: targetWeight,
+        }))
+      }
+    }
+    console.log('focusedField: ', focusedField)
+  }
+
+  function handleBlurGoalWeight() {
+    // setGoalWeight(isValidWeight())
+
+    if (goalDate) {
+      const today = new Date()
+      if (isValidDate(goalDate)) {
+        if (goalRate !== 0) {
+          const daysToTargetWeight = ((weight - goalWeight) * 7) / goalRate
+          const newDate = new Date(today)
+          const targetDate = new Date(
+            newDate.setDate(today.getDate() + daysToTargetWeight)
+          )
+
+          setGoalDate(targetDate)
+          setStatsInfo((prev) => ({
+            ...prev,
+            goalWeight: goalWeight,
+            goalRate: goalRate,
+            goalDate: targetDate,
+          }))
+        }
+        console.log(goalDate)
       }
     }
   }
@@ -707,17 +806,146 @@ const UserInfo = () => {
   //   return goalRate;
   // };
 
-  const validateGoalWeight = (weight: number) => {
-    // const bmi = weight! / Math.pow(heightMetric! / 100, 2)
-    // setBmi(bmi)
-    // if (bmi )
-    if (weight <= 0 || weight > weight * 0.75) {
-      throw new Error(`Goal weight must be between 1 and ${weight * 0.75} lbs.`)
-    }
-    setGoalWeight(weight)
-  }
+  // const validateGoalWeight = (weight: number) => {
+  //   // const bmi = weight! / Math.pow(heightMetric! / 100, 2)
+  //   // setBmi(bmi)
+  //   // if (bmi )
+  //   if (weight <= 0 || weight > weight * 0.75) {
+  //     throw new Error(`Goal weight must be between 1 and ${weight * 0.75} lbs.`)
+  //   }
+  //   setGoalWeight(weight)
+  // }
 
   // Handle mouse clicks outside Age, Month, Day, Year, DoB date
+
+  // Get user and load data if data is in db
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`/api/Users/${id}`, {
+          headers: {
+            Authorization: authHeader(),
+          },
+        })
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const user = await response.json()
+
+        if (user) {
+          const stats =
+            user.stats && user.stats.length > 0
+              ? user.stats[user.stats.length - 1]
+              : undefined
+          const goal =
+            user.goal && user.goal.length > 0
+              ? user.goal[user.goal.length - 1]
+              : undefined
+
+          /// Need to implement correctly
+          // Set stats
+          if (stats) {
+            delete stats.id
+            // console.log(stats)
+            setStatsInfo({
+              ...stats,
+              userId: user.id,
+            })
+            setAge(stats.age || '')
+            setDateOfBirth(stats.doB)
+            if (stats.doB) {
+              const dob = new Date(stats.doB)
+              setMonth(dob.getMonth() + 1)
+              setDay(dob.getDate())
+              setYear(dob.getFullYear())
+            }
+
+            setSex(stats.sex || '')
+            setHeight(stats.heightImperial || '')
+            ///////////////
+            setWeight(stats.weightImperial || '')
+            setActivityLevel(stats.activityLevel || '')
+            setActivityLevelLabel(stats.activityLevelLabel || '')
+            setBodyFatPercent(stats.bodyFatPercent || '')
+            if (stats.bodyFatPercent !== 0) {
+              setChecked(true)
+            }
+          }
+
+          // Set goals
+          if (goal) {
+            delete goal.id
+            setGoalInfo({
+              ...goal,
+              userId: user.id,
+            })
+
+            setCheckedGoals({
+              lose: goal.goalSelection === 'lose',
+              gain: goal.goalSelection === 'gain',
+              maintain: goal.goalSelection === 'maintain',
+            })
+
+            setGoalWeight(goal.goalWeight)
+            if (goal.goalWeight <= stats.weightImperial) {
+              setGoalWeight(goal.goalWeight)
+              // setGoalInfo((prev) => ({
+              //   ...prev,
+              //   goalWeight:
+              //     unit === 'metric'
+              //       ? convertWeightToMetric(goal.goalWeight)
+              //       : goal.goalWeight,
+              // }))
+            } else if (goal.goalWeight > stats.weightImperial) {
+              setGoalWeight(stats.weightImperial)
+              // setGoalInfo((prev) => ({
+              //   ...prev,
+              //   goalWeight:
+              //     unit === 'metric'
+              //       ? convertWeightToMetric(stats.weightImperial)
+              //       : stats.weightImperial,
+              // }))
+            }
+
+            if (goal.goalSelection === 'lose') {
+              setGoalRateLose(goal.goalRate)
+            } else if (goal.goalSelection === 'gain') {
+              setGoalRateGain(goal.goalRate)
+            }
+            setGoalDate(goal.goalDate)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+      }
+    }
+    fetchUserData()
+  }, [])
+
+  // USE EFFECT TO SPEED UP TESTING
+  // useEffect(() => {
+  //   setStatsInfo((prev) => ({
+  //     ...prev,
+  //     age: age,
+  //     sex: prev.sex,
+  //     weightImperial: weight,
+  //     weightMetric: convertWeightToMetric(weight),
+  //     heightImperial: height,
+  //     heightMetric: convertHeightToMetric(height),
+  //     activityLevel: activityLevel,
+  //     activityLevelLabel: prev.activityLevelLabel,
+  //   }))
+  //   setGoalInfo((prev) => ({
+  //     ...prev,
+  //     goalSelection: prev.goalSelection,
+  //     goalWeight: prev.goalWeight,
+  //     goalRate: prev.goalRate,
+  //     goalBfp: prev.goalBfp,
+  //     goalDate: prev.goalDate,
+  //   }))
+  // }, [])
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -906,49 +1134,47 @@ const UserInfo = () => {
                     <input
                       className="goal-weight"
                       type="number"
-                      name="goalWeight"
+                      name="goalWeightLose"
                       placeholder="Goal Weight"
-                      value={goalWeight || ''}
+                      max={weight}
+                      min={minLoseWeight}
+                      step="0.1"
+                      value={
+                        // displayedGoalWeight
+                        displayGoalWeightValue ||
+                        // ? displayGoalWeightValue.toFixed(1)
+                        ''
+                      }
                       onChange={handleInputChange}
+                      onBlur={handleBlurGoalWeight}
                     />
                     <DatePicker
+                      className="date-picker-calendar"
                       selected={goalDate}
                       onChange={(date) => {
-                        // onChange={(date) => {
-                        //   if (date) {
-                        //     setDateOfBirth(date)
-                        //     updateAgeFromDate(date)
-                        //     setMonth(date.getMonth() + 1)
-                        //     setDay(date.getDate())
-                        //     setYear(date.getFullYear())
-                        //     setStatsInfo((prev) => ({
-                        //       ...prev,
-                        //       doB: date,
-                        //     }))
-                        //   }
-                        // }
                         if (date) {
                           setGoalDate(date)
                           updateWeightFromDate(date)
                           setGoalInfo((prev) => ({
                             ...prev,
-                            goalDate: date!,
+                            goalWeight: prev.goalWeight,
+                            goalDate: date,
                           }))
                           handleCheckboxChange('lose')
                         }
                       }}
+                      onBlur={handleBlurGoalDate}
                     />
                   </div>
                   <input
                     type="range"
                     name="lose"
+                    step="0.1"
                     min="0"
                     max={maxRange}
-                    step="0.1"
                     className="slider-input"
                     value={goalRateLose}
                     onChange={handleInputChange}
-                    onBlur={handleBlurGoalDate}
                   />
                 </div>
               ) : (
