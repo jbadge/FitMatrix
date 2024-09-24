@@ -39,13 +39,13 @@ export type UserType = {
 
 export type StatsType = {
   userId?: number
-  age?: number
+  age: number
   doB?: Date
   sex?: SexOptionsType
-  heightMetric?: number
-  heightImperial?: number
-  weightMetric?: number
-  weightImperial?: number
+  heightMetric: number
+  heightImperial: number
+  weightMetric: number
+  weightImperial: number
   activityLevel?: number
   activityLevelLabel?: ActivityLevelType
   bodyFatPercent?: number
@@ -99,7 +99,8 @@ export const NullUser: UserType = {
 
 export const NullUserStats: StatsType = {
   doB: new Date(),
-  sex: 'M',
+  age: 0,
+  sex: 'U',
   heightMetric: 0,
   heightImperial: 0,
   weightMetric: 0,

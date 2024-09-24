@@ -10,6 +10,9 @@ How can i make goalweight show pop up error AND change value?
 Does not do calculation currently when loading up, for goalweight
 calendar not updating to the text? 
 
+Gain: goal weight placeholder not there initially
+text is off when not checked.
+checkboxes janky, they need to be re-rendered
 
 TO DO: (figured out with Greg)
   **How much would you like to lose, or what is your goal weight?

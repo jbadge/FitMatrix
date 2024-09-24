@@ -20,7 +20,7 @@ const SignedOutTdee = () => {
   const [tdeeMifflin, setTdeeMifflin] = useState(0)
   const [tdeeKatch, setTdeeKatch] = useState(0)
   const [lbmBoer, setLbmBoer] = useState(0)
-  const [lbmCalc, setLbmCalc] = useState(0)
+  const [lbmKatch, setLbmKatch] = useState(0)
   const [covertBailey, setCovertBailey] = useState(0)
   const [navyBfp, setNavyBfp] = useState(0)
   const [ymcaBfp, setYmcaBfp] = useState(0)
@@ -29,6 +29,7 @@ const SignedOutTdee = () => {
   const [bmiBfp, setBmiBfp] = useState(0)
   const [bmi, setBmi] = useState(0)
   const [statsInfo, setStatsInfo] = React.useState<StatsType>({
+    age: 0,
     sex: 'U',
     heightMetric: 0,
     heightImperial: 0,
@@ -236,25 +237,27 @@ const SignedOutTdee = () => {
       setStatsInfo((prev) => {
         const newHeightMetric =
           newUnit === 'metric'
-            ? prev.heightMetric!
-            : convertHeightToMetric(prev.heightImperial!)
+            ? prev.heightMetric
+            : convertHeightToMetric(prev.heightImperial)
         const newHeightImperial =
           newUnit === 'imperial'
-            ? prev.heightImperial!
-            : convertHeightToImperial(prev.heightMetric!)
+            ? prev.heightImperial
+            : convertHeightToImperial(prev.heightMetric)
         const newWeightMetric =
           newUnit === 'metric'
-            ? prev.weightMetric!
-            : convertWeightToMetric(prev.weightImperial!)
+            ? prev.weightMetric
+            : convertWeightToMetric(prev.weightImperial)
         const newWeightImperial =
           newUnit === 'imperial'
-            ? prev.weightImperial!
-            : convertWeightToImperial(prev.weightMetric!)
+            ? prev.weightImperial
+            : convertWeightToImperial(prev.weightMetric)
 
         setHeight(newUnit === 'metric' ? newHeightMetric : newHeightImperial)
         setWeight(newUnit === 'metric' ? newWeightMetric : newWeightImperial)
 
         return {
+          sex: prev.sex,
+          age: prev.age,
           heightMetric: newHeightMetric,
           heightImperial: newHeightImperial,
           weightMetric: newWeightMetric,
@@ -282,7 +285,7 @@ const SignedOutTdee = () => {
     // BMI //
     /////////
     // Not particular useful number, included for use in Heritage equation
-    const bmi = weightMetric! / Math.pow(heightMetric! / 100, 2)
+    const bmi = weightMetric / Math.pow(heightMetric / 100, 2)
     setBmi(bmi)
 
     /////////////////////////
@@ -297,13 +300,13 @@ const SignedOutTdee = () => {
           ? 495 /
               (1.0324 -
                 0.19077 * Math.log10(waist * 2.54 - neck * 2.54) +
-                0.15456 * Math.log10(heightMetric!)) -
+                0.15456 * Math.log10(heightMetric)) -
             450
           : // female calc off?
             495 /
               (1.29579 -
                 0.35004 * Math.log10(waist * 2.54 + hips * 2.54 - neck * 2.54) +
-                0.221 * Math.log10(heightMetric!)) -
+                0.221 * Math.log10(heightMetric)) -
             450
         : // Imperial formula
           sex === 'M'
@@ -318,10 +321,10 @@ const SignedOutTdee = () => {
     // Imperial formula
     const covertBaileyCalc =
       sex === 'M'
-        ? age! < 30
+        ? age < 30
           ? waist + 0.5 * hips - 3 * forearm - wrist
           : waist + 0.5 * hips - 2.7 * forearm - wrist
-        : age! < 30
+        : age < 30
           ? hips + 0.8 * thigh - 2 * calf - wrist
           : hips + thigh - 2 * calf - wrist
 
@@ -332,30 +335,29 @@ const SignedOutTdee = () => {
         ? // (977.17 * weightImperial) / Math.pow(heightImperial, 2) +
           // 0.16 * age -
           // 19.34
-          1.39 * bmi + 0.16 * age! - 19.34
-        : 1.39 * bmi + 0.16 * age! - 9
+          1.39 * bmi + 0.16 * age - 19.34
+        : 1.39 * bmi + 0.16 * age - 9
 
     // YMCA Body Fat Percentage Formula
     const ymcaBfpCalc =
       sex === 'M'
-        ? ((4.15 * waist - 0.082 * weightImperial! - 98.42) / weightImperial!) *
+        ? ((4.15 * waist - 0.082 * weightImperial - 98.42) / weightImperial) *
           100
-        : ((4.15 * waist - 0.082 * weightImperial! - 76.76) / weightImperial!) *
+        : ((4.15 * waist - 0.082 * weightImperial - 76.76) / weightImperial) *
           100
 
     // Modified YMCA Body Fat Percentage Formula
     const modYmcaBfpCalc =
       sex === 'M'
-        ? ((-0.082 * weightImperial! + 4.15 * waist - 94.42) /
-            weightImperial!) *
+        ? ((-0.082 * weightImperial + 4.15 * waist - 94.42) / weightImperial) *
           100
-        : ((0.268 * weightImperial! -
+        : ((0.268 * weightImperial -
             0.318 * wrist +
             0.157 * waist +
             0.245 * hips -
             0.434 * forearm -
             8.987) /
-            weightImperial!) *
+            weightImperial) *
           100
 
     const averageBfpCalc =
@@ -374,18 +376,22 @@ const SignedOutTdee = () => {
 
     // Calculated Lean Body Mass using recorded weight and Navy Method's result
     const selectedBfp = bodyFatPercent === 0 ? navyBfpCalc : bodyFatPercent
-    const lbmKatchCalc = weightImperial! * (1 - selectedBfp / 100)
+    const lbmKatchCalc = weightImperial * (1 - selectedBfp / 100)
 
     // Boer formula for obese individuals with a BMI between 35 and 40
     const lbmBoerCalc =
       unit === 'metric'
         ? sex === 'M'
-          ? 0.407 * weightMetric! + 0.267 * heightMetric! - 19.2
-          : 0.252 * weightMetric! + 0.473 * heightMetric! - 48.3
+          ? 0.407 * weightMetric + 0.267 * heightMetric - 19.2
+          : 0.252 * weightMetric + 0.473 * heightMetric - 48.3
         : sex === 'M'
-          ? (0.407 * weightMetric! + 0.267 * heightMetric! - 19.2) * 2.20462
-          : (0.252 * weightMetric! + 0.473 * heightMetric! - 48.3) * 2.20462
-
+          ? convertWeightToImperial(
+              0.407 * weightMetric + 0.267 * heightMetric - 19.2
+            ) // * 2.20462
+          : convertWeightToImperial(
+              0.252 * weightMetric + 0.473 * heightMetric - 48.3
+            ) //* 2.20462
+    console.log(lbmBoerCalc)
     // Hume formula used for drug dosages
     // let lbmHumeCalc =
     //   sex === 'M'
@@ -398,7 +404,7 @@ const SignedOutTdee = () => {
     //     ? 1.1 * weightMetric - 128 * Math.pow(weightMetric / heightMetric, 2)
     //     : 1.07 * weightMetric - 148 * Math.pow(weightMetric / heightMetric, 2)
 
-    setLbmCalc(lbmKatchCalc)
+    setLbmKatch(lbmKatchCalc)
     setLbmBoer(lbmBoerCalc)
 
     //////////////////////
@@ -408,11 +414,11 @@ const SignedOutTdee = () => {
     // Mifflin St Jeor Formula
     const bmrMifflinCalc =
       sex === 'M'
-        ? 10 * weightMetric! + 6.25 * heightMetric! - 5 * age! + 5
-        : 10 * weightMetric! + 6.25 * heightMetric! - 5 * age! - 161
+        ? 10 * weightMetric + 6.25 * heightMetric - 5 * age + 5
+        : 10 * weightMetric + 6.25 * heightMetric - 5 * age - 161
 
     // Katch-McArdle Formula
-    const bmrKatchCalc = 370 + 21.6 * (weightMetric! * (1 - selectedBfp / 100))
+    const bmrKatchCalc = 370 + 21.6 * (weightMetric * (1 - selectedBfp / 100))
 
     setBmrMifflin(bmrMifflinCalc)
     setBmrKatch(bmrKatchCalc)
@@ -427,7 +433,7 @@ const SignedOutTdee = () => {
     const rmrMifflinCalc = bmrMifflinCalc * 1.11
     // Katch-McArdle Formula
     const rmrKatchCalc =
-      (370 + 21.6 * (weightMetric! * (1 - selectedBfp / 100))) * 1.11
+      (370 + 21.6 * (weightMetric * (1 - selectedBfp / 100))) * 1.11
 
     setRmrCunningham(cunninghamCalc)
     setRmrMifflin(rmrMifflinCalc)
@@ -444,78 +450,110 @@ const SignedOutTdee = () => {
   }
 
   return (
-    <main className="calories-page">
+    // <main className="calories-page">
+    <main className="user-page">
+      {/* <div className="vert"></div> */}
       <h1>FitMatrix</h1>
-      <div className="calories-container">
-        <button onClick={toggleUnit}>
-          Switch to {unit === 'metric' ? 'Imperial' : 'Metric'}
-        </button>
+      <div className="user-container">
+        <div className="button-container">
+          <button onClick={toggleUnit}>
+            Switch to {unit === 'metric' ? 'Imperial' : 'Metric'}
+          </button>
+        </div>
+
         <form onSubmit={handleFormSubmit}>
-          <p className="form-input">
-            <label htmlFor="age">
-              Enter Your Details
-              <br />
-              <br />
-              Age:
-            </label>
-            <input
-              type="number"
-              name="age"
-              placeholder="Age"
-              value={age || ''}
-              onChange={handleInputChange}
-            />
-          </p>
-          <p className="form-input">
-            <label htmlFor="sex">Sex: </label>
-            <select name="sex" value={sex || ''} onChange={handleInputChange}>
-              <option value="Select">Select</option>
-              <option value="M">M</option>
-              <option value="F">F</option>
-            </select>
-          </p>
-          <p className="form-input">
-            <label htmlFor="height">
-              Height{unit === 'metric' ? ' (cm)' : ' (in)'}:
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              name="height"
-              placeholder="Height"
-              value={displayHeightValue || ''}
-              required
-              onChange={handleInputChange}
-            />
-          </p>
-          <p className="form-input">
-            <label htmlFor="weight">
-              Weight{unit === 'metric' ? ' (kg)' : ' (lbs)'}:
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              name="weight"
-              placeholder="Weight"
-              value={displayWeightValue || ''}
-              onChange={handleInputChange}
-            />
-          </p>
-          <p className="form-input">
-            <label htmlFor="activity-level">Activity Level: </label>
-            <select
-              name="activityLevelLabel"
-              value={activityLevelLabel}
-              onChange={handleInputChange}
-            >
-              <option value="None">None</option>
-              <option value="Sedentary">Sedentary</option>
-              <option value="Light">Light</option>
-              <option value="Moderate">Moderate</option>
-              <option value="Heavy">Heavy</option>
-              <option value="Athlete">Athlete</option>
-            </select>
-          </p>
+          <div className="user-stats">
+            <div className="form-input">
+              <label htmlFor="age">
+                Enter Your Details
+                <br />
+                <br />
+                Age:
+              </label>
+              <input
+                type="number"
+                name="age"
+                placeholder="Age"
+                value={age || ''}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="form-input">
+              <label htmlFor="sex">Sex: </label>
+              <select
+                name="sex"
+                value={sex || ''}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select</option>
+                <option value="M">M</option>
+                <option value="F">F</option>
+              </select>
+            </div>
+            <div className="form-input">
+              <label htmlFor="height">
+                Height{unit === 'metric' ? ' (cm)' : ' (in)'}:
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                name="height"
+                placeholder="Height"
+                value={displayHeightValue || ''}
+                required
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="form-input">
+              <label htmlFor="weight">
+                Weight{unit === 'metric' ? ' (kg)' : ' (lbs)'}:
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                name="weight"
+                placeholder="Weight"
+                value={displayWeightValue || ''}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="form-input">
+              <label htmlFor="activity-level">Activity Level: </label>
+              <select
+                name="activityLevelLabel"
+                value={activityLevelLabel}
+                onChange={handleInputChange}
+                required
+              >
+                {/* <option value="">Select</option> */}
+                {/* <option value="None">None</option> */}
+                <option value="Sedentary">Sedentary</option>
+                <option value="Light">Light</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Heavy">Heavy</option>
+                <option value="Athlete">Athlete</option>
+              </select>
+            </div>
+          </div>
+          <div className="activity-definitions">
+            {/* <p>None: Almost Always Sitting or Laying.</p> */}
+            <p>Sedentary: Little or No Exercise, Moderate Walking, Desk Job.</p>
+            <p>
+              Light Activity: Light Physical Work, Exercise or Sports 1 to 3
+              Days a Week.
+            </p>
+            <p>
+              Moderate Activity: Physical Work, Exercise, or Sports 4 to 5 Days
+              a Week.
+            </p>
+            <p>
+              Heavy Activity: Heavy Physical Work, Exercise, or Sports 6 to 7
+              Days a Week.
+            </p>
+            <p>Athlete: Professional or Olympic Athlete.</p>
+          </div>
           <div className="optional">
             <p className="optional-heading">Optional: </p>
             <label>
@@ -561,21 +599,38 @@ const SignedOutTdee = () => {
         </form>
         <div className={`calories-user-stats ${isSubmitted ? 'show' : ''}`}>
           <div className="button-group">
-            <button onClick={() => setSelectedFilter('BF%')}>BF%</button>
-            <button onClick={() => setSelectedFilter('BMR')}>BMR</button>
-            <button onClick={() => setSelectedFilter('LBM')}>LBM</button>
-            <button onClick={() => setSelectedFilter('TDEE')}>TDEE</button>
+            <button onClick={() => setSelectedFilter('TDEE')}>
+              Total Daily Energy Expenditure
+            </button>
+            <button onClick={() => setSelectedFilter('BF%')}>
+              Body Fat Percent
+            </button>
+            <button onClick={() => setSelectedFilter('LBM')}>
+              Lean Body Mass
+            </button>
+            <button onClick={() => setSelectedFilter('BMR')}>
+              Basal Metabolic Rate
+            </button>
             <button onClick={() => setSelectedFilter('ALL')}>ALL</button>
           </div>
-          {(selectedFilter === 'ALL' ||
-            selectedFilter === 'TDEE' ||
-            selectedFilter === 'BMR') && (
-            <div>All metabolic expenditures report in Kcal/day</div>
-          )}
           {selectedFilter === 'ALL' || selectedFilter === 'BMR' ? (
             <>
+              <p>
+                Basal Metabolic Rate, or BMR, is the amount of calories burned
+                at rest as a result of normal involuntary body functions.
+                <br />
+                <br />
+                Resting Metabolic Rate, or RMR, is the number of calories your
+                body actually burns at rest, including intentional movement of
+                the body.
+                <br />
+                <br />
+                All metabolic expenditure formulas report in Kcal/day.
+              </p>
               <div className="result-row">
-                <div className="result-label">BMR (Mifflin St. Jeor):</div>
+                <div className="result-label">
+                  BMR (Mifflin St. Jeor Formula):
+                </div>
                 <div className="result-value"> {bmrMifflin.toFixed(0)}</div>
               </div>
               {/* {bodyFatPercent > 0 && (
@@ -585,36 +640,48 @@ const SignedOutTdee = () => {
             </div>
           )} */}
               <div className="result-row">
-                <div className="result-label">BMR (Katch-McArdle):</div>
+                <div className="result-label">BMR (Katch-McArdle Formula):</div>
                 <div className="result-value"> {bmrKatch.toFixed(0)} </div>
               </div>
               <div className="result-row">
-                <div className="result-label">RMR (Cunningham):</div>
+                <div className="result-label">RMR (Cunningham Formula):</div>
                 <div className="result-value"> {rmrCunningham.toFixed(0)} </div>
               </div>
               <div className="result-row">
-                <div className="result-label">RMR (Mifflin St. Jeor):</div>
+                <div className="result-label">
+                  RMR (Mifflin St. Jeor Formula):
+                </div>
                 <div className="result-value"> {rmrMifflin.toFixed(0)} </div>
               </div>
               <div className="result-row">
-                <div className="result-label">RMR (Katch-McArdle):</div>
+                <div className="result-label">RMR (Katch-McArdle Formula):</div>
                 <div className="result-value">{rmrKatch.toFixed(0)} </div>
               </div>
             </>
           ) : null}
           {selectedFilter === 'ALL' || selectedFilter === 'TDEE' ? (
             <>
+              <p>
+                TDEE (Total Daily Energy Expenditure) is the estimated number of
+                calories you burn each day, based on defined activity levels.
+                <br />
+                <br />
+                All metabolic expenditure formulas report in Kcal/day.
+              </p>
               <div className="result-row">
-                <div className="result-label">TDEE (Mifflin St. Jeor):</div>
+                <div className="result-label">
+                  TDEE (Mifflin St. Jeor Formula):
+                </div>
                 <div className="result-value"> {tdeeMifflin.toFixed(0)}</div>
               </div>
               {/* {bodyFatPercent > 0 && ( */}
               <div className="result-row">
-                <div className="result-label">TDEE (Katch-McArdle):</div>
+                <div className="result-label">
+                  TDEE (Katch-McArdle Formula):
+                </div>
                 <div className="result-value">{tdeeKatch.toFixed(0)} </div>
               </div>
               {/* )} */}
-
               {isSubmitted && tdeeCalc !== 0 && (
                 <div className="result-row">
                   <div className="result-label">
@@ -627,16 +694,38 @@ const SignedOutTdee = () => {
           ) : null}
           {selectedFilter === 'ALL' || selectedFilter === 'LBM' ? (
             <>
-              <div className="result-row">
-                <div className="result-label">
-                  Lean Body Mass (calculated from Body Fat Percent):
+              <p>
+                Lean body mass, LBM, refers to everything except fat; muscle,
+                organs, bone, etc.
+              </p>
+              {bodyFatPercent > 0 && (
+                <div className="result-row">
+                  <div className="result-label">
+                    Lean Body Mass (calculated from Body Fat Percent):
+                  </div>
+                  <div className="result-value">{lbmKatch.toFixed(1)}</div>
                 </div>
-                <div className="result-value">{lbmCalc.toFixed(1)}</div>
-              </div>
+              )}
               <div className="result-row">
                 <div className="result-label">Lean Body Mass (Boer):</div>
                 <div className="result-value">{lbmBoer.toFixed(1)}</div>
               </div>
+              {bodyFatPercent > 0 && lbmBoer ? null : (
+                <>
+                  <div className="result-row">
+                    <div className="result-label"></div>
+                    <div className="result-value"></div>
+                  </div>
+                  <div className="result-row">
+                    <div className="result-label"></div>
+                    <div className="result-value"></div>
+                  </div>
+                  <div className="result-row">
+                    <div className="result-label"></div>
+                    <div className="result-value"></div>
+                  </div>
+                </>
+              )}
               {/* <div className="result-row">
                 <div className="result-label">Lean Body Mass (James):</div>
                 <div className="result-value">{lbmJames.toFixed(1)}</div>
@@ -649,6 +738,15 @@ const SignedOutTdee = () => {
           ) : null}
           {selectedFilter === 'ALL' || selectedFilter === 'BF%' ? (
             <>
+              <p>
+                Body fat percentage is how much of your body is made up of
+                adipose tissue (body fat) as opposed to muscle & bone.
+                <br />
+                <br />
+                BMI is a crude but sometimes useful number that relates body
+                weight to height. It is used sometimes to gauge whether a person
+                is at a healthy weight.
+              </p>
               {/* Body Fat Percentages */}
               <div className="result-row">
                 <div className="result-label">Covert Bailey Method:</div>
@@ -666,7 +764,6 @@ const SignedOutTdee = () => {
                 <div className="result-label">Modified YMCA Method:</div>
                 <div className="result-value"> {modYmcaBfp.toFixed(1)}%</div>
               </div>
-
               <div className="result-row">
                 <div className="result-label">
                   Heritage BMI to Body Fat Percentage Method:

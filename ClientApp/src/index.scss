@@ -245,155 +245,139 @@ footer {
   border-top: solid 1px black;
 }
 
-.calories-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding-top: 6rem;
-  padding-bottom: 6rem;
-  h1 {
-    padding-bottom: 2rem;
-    margin: 0 auto;
-    text-align: center;
-  }
-  & {
-    margin: 0 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    .calories-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+// .calories-page {
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: flex-start;
+//   align-items: center;
+//   padding-top: 6rem;
+//   padding-bottom: 6rem;
+//   h1 {
+//     padding-bottom: 2rem;
+//     margin: 0 auto;
+//     text-align: center;
+//   }
+//   & {
+//     margin: 0 1rem;
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: center;
+//     align-items: center;
+//     font-size: 20px;
+//     .calories-container {
+//       display: flex;
+//       flex-direction: column;
+//       justify-content: center;
+//       align-items: center;
+//     }
 
-    .reminder {
-      display: block;
-      font-size: 0.8rem;
-    }
-    .calories-input-stats {
-      margin-top: 2rem;
-    }
-    .calories-input-user {
-      padding: 1rem;
-      color: grey;
-    }
+//     .reminder {
+//       display: block;
+//       font-size: 0.8rem;
+//     }
+//     .calories-input-stats {
+//       margin-top: 2rem;
+//     }
+//     .calories-input-user {
+//       padding: 1rem;
+//       color: grey;
+//     }
 
-    .calories-user-stats {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      text-align: center;
-      padding-top: 2rem;
-      margin-bottom: 2rem;
-      font-size: 14px;
-      visibility: hidden;
-      opacity: 0;
-      transition:
-        visibility 0s,
-        opacity 0.5s linear;
-      height: auto;
-      & > div {
-        padding: 0.4rem;
-      }
-      .result-row {
-        display: block;
-        .result-value {
-          padding-top: 0.5rem;
-          font-size: 1.2rem;
-        }
-      }
-    }
-    .calories-user-stats.show {
-      visibility: visible;
-      opacity: 1;
-    }
-  }
-}
+//     .calories-user-stats {
+//       display: flex;
+//       flex-direction: column;
+//       gap: 10px;
+//       text-align: center;
+//       padding-top: 2rem;
+//       margin-bottom: 2rem;
+//       font-size: 14px;
+//       visibility: hidden;
+//       opacity: 0;
+//       transition:
+//         visibility 0s,
+//         opacity 0.5s linear;
+//       height: auto;
+//       & > div {
+//         padding: 0.4rem;
+//       }
+//       .result-row {
+//         display: block;
+//         .result-value {
+//           padding-top: 0.5rem;
+//           font-size: 1.2rem;
+//         }
+//       }
+//     }
+//     .calories-user-stats.show {
+//       visibility: visible;
+//       opacity: 1;
+//     }
+//   }
+// }
 
 .optional {
-  padding-top: 2rem;
+  padding-top: 3rem;
 }
 
-.date-picker-age {
-  position: absolute;
-  top: 345px;
-  right: 500px;
-  transform: translateX(50%);
+// .date-picker-age {
+//   position: absolute;
+//   top: 345px;
+//   right: 500px;
+//   transform: translateX(50%);
+// }
+
+.vert {
+  position: absolute; /* Position the line absolutely */
+  top: 0; /* Align to the top of the page */
+  left: 50%; /* Center it horizontally */
+  width: 2px; /* Width of the line */
+  height: 200%; /* Full height of the page */
+  background-color: black; /* Color of the line */
+  transform: translateX(-50%); /* Center the line properly */
 }
 
 .form-input {
   display: block;
   margin: 1em 0 1em 0;
-  .date-picker-age {
-    input[type='text'] {
-      border-radius: 2rem;
-      width: 150px;
-      text-align: center;
+  .birthday-popup {
+    position: absolute;
+    .date-picker-age {
+      position: absolute;
+      transform: translate(50%, -100%);
+      input[type='text'] {
+        border-radius: 2rem;
+        width: 150px;
+        text-align: center;
+      }
     }
   }
 }
 
-.user-page .user-goals .goal-rate[type='number'] {
+.activity-definitions {
+  // position: absolute;
+  // margin: 0 auto;
+  // top: 20px;
+  // background-color: red;
   font-size: 14px;
-  width: 80px;
+  // overflow: hidden;
+  width: 328.9px;
+  // max-width: 250px;
 }
 
-// .user-page .user-goals .goal-weight[type='number'] {
-//   font-size: 14px;
-//   width: 80px;
-//   margin-left: 45px;
-//   position: relative;
-//   top: 20px;
+form {
+  // width: 82.6%;
+  // max-width: 250px;
+}
+
+// .result-row {
+//   min-height: 50px;
 // }
 
-.date-picker-calendar {
-  z-index: 1000;
-}
-
-.user-page .user-goals {
-  .goal-weight[type='number'] {
-    font-size: 14px;
-    width: 80px;
-    margin-left: 35px;
-    // position: relative;
-    // top: 20px;
-  }
-  .date-picker-goal {
-    position: absolute;
-    top: 10;
-    right: 50;
-    // transform: translateX(49%);
-    transform: translate(85%, -65%);
-    z-index: 1000;
-  }
-  .date-picker-goal {
-    input[type='text'] {
-      border-radius: 2rem;
-      width: 150px;
-      text-align: center;
-    }
-  }
-}
-
-.slider-input {
-  position: absolute;
-  pointer-events: auto;
-  transform: translate(-100%, 20%);
-}
-
-.month-day-year {
-  display: flex;
-  span {
-    flex: 1;
-  }
-  input {
-    width: 100%;
-    box-sizing: border-box;
+.button-group {
+  button {
+    border: 1px solid black;
+    margin: 1px;
+    gap: 5px;
   }
 }
 
@@ -418,10 +402,32 @@ footer {
     font-size: 20px;
     .user-container {
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      width: 263px;
+      flex-wrap: wrap;
+      .user-container > div {
+        flex: 1 0 50%;
+      }
+      .button-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        // display: block;
+        // margin: 0 auto;
+        // text-align: center;
+      }
+      form .form-input {
+        .month-day-year {
+          margin: 4px;
+          display: flex;
+          span {
+            flex: 1;
+          }
+          input {
+            box-sizing: border-box;
+          }
+        }
+      }
     }
     ul li {
       list-style-type: none;
@@ -434,72 +440,124 @@ footer {
       padding: 1rem;
       color: grey;
     }
+    .user-stats {
+      margin: auto;
+      max-width: 200px;
+      align-items: center;
+    }
     .user-goals {
-      position: relative;
       padding-top: 3rem;
       font-size: 14px;
       overflow: visible;
-      display: flex;
-      flex-direction: column;
       .goal-heading {
-        position: absolute;
+        text-align: center;
         font-size: 20px;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
         margin: 0;
-        padding: 0;
-        padding-top: 1.6rem;
-        white-space: nowrap;
       }
       & label {
+        position: relative;
         display: flex;
         align-items: center;
-        justify-content: space-between;
         line-height: 32px;
-        position: relative;
-        // z-index: -1000;
+        padding-bottom: 10px;
+        padding-top: 15px;
         .input-container {
           position: absolute;
-          right: 0;
+          left: 40%;
           top: 20%;
+          .goal-rate {
+            margin-right: 2px;
+            width: 20%;
+          }
+          .date-picker-goal {
+            position: absolute;
+            top: 10;
+            transform: translate(50%, -50%);
+            z-index: 1000;
+            .goal-weight[type='number'] {
+              font-size: 20px;
+              width: 25%;
+              margin-left: 50px;
+              margin-right: 2px;
+            }
+            input[type='text'] {
+              border-radius: 2rem;
+              width: 150px;
+              text-align: center;
+            }
+            .date-picker-calendar {
+              z-index: 1000;
+            }
+          }
         }
-        .slider-input {
-          position: absolute;
-          pointer-events: auto;
-          top: 0;
-          transform: translate(-110%, 120%);
-          width: 100%;
-        }
-        .lose-placeholder {
-          position: absolute;
-          right: -80px;
-        }
-        .gain-placeholder {
-          position: relative;
-          right: -22px;
-        }
-        input[type='checkbox']:disabled {
-          opacity: 1;
-          cursor: not-allowed;
-        }
+      }
+      .slider-input {
+        position: absolute;
+        pointer-events: auto;
+        top: 0;
+        transform: translate(-95%, 120%);
+        padding-top: 2px;
+        width: 50%;
+        z-index: 1000;
+      }
+      .lose-placeholder {
+        position: absolute;
+        right: 0px;
+      }
+      .gain-placeholder {
+        position: absolute;
+        right: 0px;
+      }
+      input[type='checkbox']:disabled {
+        opacity: 1;
+        cursor: not-allowed;
+      }
 
-        input[type='checkbox']:disabled + label {
-          color: #000;
-        }
-      }
-      & input[type='checkbox'] {
-        margin-right: 10px;
-        height: 20px;
-        width: 20px;
-        vertical-align: middle;
-      }
-      & input[type='number'] {
-        border: solid 1px lightgray;
-        margin: 0 20px 0 10px;
-        width: 60px;
+      input[type='checkbox']:disabled + label {
+        color: #000;
       }
     }
+    & input[type='checkbox'] {
+      margin-right: 10px;
+      height: 20px;
+      width: 20px;
+      vertical-align: middle;
+    }
+    & input[type='number'] {
+      border: solid 1px lightgray;
+      margin: 0 20px 0 10px;
+      width: 60px;
+    }
+  }
+  .calories-user-stats {
+    flex: 1 0 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    padding-top: 2rem;
+    margin-bottom: 2rem;
+    font-size: 14px;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      visibility 0s,
+      opacity 0.5s linear;
+    height: auto;
+    & > div {
+      padding: 0.4rem;
+    }
+    .result-row {
+      display: block;
+      .result-value {
+        padding-top: 0.5rem;
+        font-size: 1.2rem;
+      }
+    }
+  }
+  .calories-user-stats.show {
+    visibility: visible;
+    opacity: 1;
   }
 }
 
