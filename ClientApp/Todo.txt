@@ -14,6 +14,9 @@ Gain: goal weight placeholder not there initially
 text is off when not checked.
 checkboxes janky, they need to be re-rendered
 
+slider won't work on deployed site
+
+
 TO DO: (figured out with Greg)
   **How much would you like to lose, or what is your goal weight?
   ** put a lbs or kg on right of rate box to clarify what it is
