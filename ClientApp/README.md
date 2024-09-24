@@ -9,7 +9,7 @@
 
 <!-- Write a short sentence or two about this project and what it does. Be sure to include a link and a screenshot. -->
 
-**Link to project:** https://fit-matrix-nrjdpmu3d-jbadges-projects.vercel.app/
+**Link to project:** https://fit-matrix-eactodiwa-jbadges-projects.vercel.app/
 
 <!-- ![alt tag](http://placecorgi.com/1200/650) -->
 
