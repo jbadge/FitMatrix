@@ -454,6 +454,7 @@ const SignedOutTdee = () => {
     <main className="user-page">
       {/* <div className="vert"></div> */}
       <h1>FitMatrix</h1>
+      <h6>Remember, drink 8 glasses of water a day!</h6>
       <div className="user-container">
         <div className="button-container">
           <button onClick={toggleUnit}>
