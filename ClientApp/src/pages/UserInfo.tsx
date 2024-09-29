@@ -348,11 +348,13 @@ const UserInfo = () => {
 
   const isValidWeight = (): boolean => {
     if (goalInfo.goalSelection === 'lose') {
-      const bmi =
+      const tempBmi =
         goalWeightLoseMetric / Math.pow(statsInfo.heightMetric / 100, 2)
-      setBmi(bmi)
+      setBmi(tempBmi)
       // console.log(bmi)
-      if (bmi < 18.5) {
+      if (tempBmi < 18.5) {
+        // MAY NOT NEED STATE VARIABLE HERE...
+        console.log(tempBmi)
         console.log(bmi)
         const minimumAllowedWeight =
           18.5 * Math.pow(statsInfo.heightMetric / 100, 2)
