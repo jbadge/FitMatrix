@@ -1,22 +1,35 @@
-need help with the date for age (change m,d ,y to span)
+1. need help making 0.5 steps in lose fat with max being 10%
 
+How can i make goalWeight show pop up error AND change value? (currently isValidWeight)
 
-need user to stay signed in after signing up
+2. Need to refactor long code on TDEE pages
+ 
+convert rate and goalWeight to kg when toggled
 
+Rate does not round up
 
-need help making 0.5 steps in lose fat with max being 10%
+Weight does not update in goal for new user first time
 
-How can i make goalweight show pop up error AND change value?
-Does not do calculation currently when loading up, for goalweight
-calendar not updating to the text? 
+*Would height in feet and inches be cleaner?
 
-Gain: goal weight placeholder not there initially
-text is off when not checked.
-checkboxes janky, they need to be re-rendered
+Implement WorkoutAnalysis
 
-slider won't work on deployed site
+Implement Measurements
 
+need signedouttdee to allow submissions over and over
 
-TO DO: (figured out with Greg)
-  **How much would you like to lose, or what is your goal weight?
-  ** put a lbs or kg on right of rate box to clarify what it is
+default goal Date to a week away. use this date for minimum
+
+does goalinfo bodyfatpercent need to be diff than statsinfo bodyfatpercent?
+
+why is goalRate one behind?!
+
+does statsinfo AND goalinfo need goaldate, etc?
+
+zindex of lose fat too high goes thru navbar
+
+Add something to track user using creating +4-7lbs
+
+should body fat percent change based on the goal your setting in real time?
+
+move validation error message slightly

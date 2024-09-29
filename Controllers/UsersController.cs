@@ -158,6 +158,25 @@ namespace FitMatrix.Controllers
             return CreatedAtAction("GetStats", new { id = stats.Id }, stats);
         }
 
+        // Add stats to a user
+        // POST: /api/Users/5/Measurements
+        [HttpPost("{userId}/measurements")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Stats>> CreateMeasurementsForUser(int userId, Measurements measurements)
+        {
+            // stats.UserId = GetCurrentUserId();
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _context.Measurements.Add(measurements);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction("GetStats", new { id = measurements.Id }, measurements);
+        }
+
         // Add goal to a user
         // POST: /api/Users/5/Goal
         [HttpPost("{userId}/goal")]

@@ -15,6 +15,7 @@ namespace FitMatrix.Models
         public DbSet<Stats> Stats { get; set; }
         public DbSet<Goal> Goal { get; set; }
         public DbSet<Progress> Progress { get; set; }
+        public DbSet<Measurements> Measurements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

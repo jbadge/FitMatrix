@@ -264,6 +264,7 @@ const SignedOutTdee = () => {
           weightImperial: newWeightImperial,
         }
       })
+
       return newUnit
     })
   }

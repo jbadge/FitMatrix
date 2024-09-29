@@ -27,14 +27,14 @@ export default defineConfig((configEnv) => ({
       ],
     }),
   ],
-  // server: {
-  //   port: 3000,
-  //   WDS_SOCKET_PORT: 0,
-  //   hmr: {
-  //     port: 3000, // Ensure HMR is set to the correct port
-  //     protocol: 'ws', // Use 'wss' if serving over HTTPS
-  //   },
-  // },
+  server: {
+    port: 3000,
+    WDS_SOCKET_PORT: 0,
+    hmr: {
+      port: 3000, // Ensure HMR is set to the correct port
+      protocol: 'ws', // Use 'wss' if serving over HTTPS
+    },
+  },
   // resolve: {
   //   alias: {
   //     '@': path.resolve(__dirname, 'src'),

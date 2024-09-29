@@ -42,10 +42,10 @@ export type StatsType = {
   age: number
   doB?: Date
   sex?: SexOptionsType
-  heightMetric: number
   heightImperial: number
-  weightMetric: number
   weightImperial: number
+  heightMetric: number
+  weightMetric: number
   activityLevel?: number
   activityLevelLabel?: ActivityLevelType
   bodyFatPercent?: number
@@ -54,17 +54,24 @@ export type StatsType = {
 export type GoalType = {
   userId?: number
   goalSelection?: GoalOptionsType
-  goalWeight?: number
-  goalRate?: number
+  goalWeightLoseImperial?: number
+  goalRateLoseImperial?: number
+  goalWeightGainImperial?: number
+  goalRateGainImperial?: number
+  goalWeightLoseMetric?: number
+  goalRateLoseMetric?: number
+  goalWeightGainMetric?: number
+  goalRateGainMetric?: number
+
   goalBfp?: number
-  goalDate?: Date
+  goalDate?: string
 }
 
 export type ProgressType = {
   userId?: number
   dateOfEntry?: Date
-  progressWeightMetric?: number
   progressWeightImperial?: number
+  progressWeightMetric?: number
   calories?: number
   bodyFatPercent?: number
 }
@@ -101,8 +108,8 @@ export const NullUserStats: StatsType = {
   doB: new Date(),
   age: 0,
   sex: 'U',
-  heightMetric: 0,
   heightImperial: 0,
-  weightMetric: 0,
   weightImperial: 0,
+  heightMetric: 0,
+  weightMetric: 0,
 }

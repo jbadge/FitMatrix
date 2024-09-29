@@ -354,14 +354,23 @@ footer {
 }
 
 .activity-definitions {
-  // position: absolute;
-  // margin: 0 auto;
-  // top: 20px;
-  // background-color: red;
   font-size: 14px;
-  // overflow: hidden;
   width: 328.9px;
   // max-width: 250px;
+}
+
+// #lose-weight-input {
+//   background-color: red;
+//   position: absolute;
+//   top: 20px;
+//   margin-left: auto;
+//   margin-right: auto;
+// }
+
+input:invalid {
+  // margin-top: 40px !important;
+  // margin-left: 100px !important;
+  background-color: red;
 }
 
 form {

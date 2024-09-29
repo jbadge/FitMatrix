@@ -6,8 +6,14 @@ namespace FitMatrix.Models
     {
         public int Id { get; set; }
         public string GoalSelection { get; set; }
-        public double GoalWeight { get; set; }
-        public double GoalRate { get; set; }
+        public double GoalWeightLoseImperial { get; set; }
+        public double GoalRateLoseImperial { get; set; }
+        public double GoalWeightGainImperial { get; set; }
+        public double GoalRateGainImperial { get; set; }
+        public double GoalWeightLoseMetric { get; set; }
+        public double GoalRateLoseMetric { get; set; }
+        public double GoalWeightGainMetric { get; set; }
+        public double GoalRateGainMetric { get; set; }
         public double GoalBodyFatPercent { get; set; }
         public DateTime GoalDate { get; set; }
 
