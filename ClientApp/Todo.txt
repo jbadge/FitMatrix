@@ -4,7 +4,7 @@
 2. Need to refactor long code on TDEE pages
  
 
-Rate does not round up
+
 
 Weight does not update in goal for new user first time
 

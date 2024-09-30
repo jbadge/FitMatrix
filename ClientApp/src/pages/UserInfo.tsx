@@ -52,10 +52,11 @@ async function submitGoal(entry: GoalType) {
     throw await response.json()
   }
 }
+
 type InteractionType = 'weight' | 'rate' | 'date' | null
 
 interface InteractionData {
-  goalDate: string | null
+  goalDate: Date | null
   goalRate: number | null
   goalWeight: number | null
   lastInteraction: InteractionType
@@ -101,7 +102,7 @@ const UserInfo = () => {
     maintain: false,
   })
 
-  const [goalDate, setGoalDate] = useState('')
+  const [goalDate, setGoalDate] = useState(new Date()) //'')
 
   const [goalWeight, setGoalWeight] = useState(0)
   const [goalRate, setGoalRate] = useState(0)
@@ -803,7 +804,8 @@ const UserInfo = () => {
   ///////////////////
   // Update Functions
   ///////////////////
-  function updateGoal(weight?: number, rate?: number, date?: string) {
+  function updateGoal(weight?: number, rate?: number, date?: Date | null) {
+    //string) {
     const currentInteraction = interactionData.lastInteraction
 
     let newInteraction: InteractionType = null
@@ -833,6 +835,13 @@ const UserInfo = () => {
       interactionData.goalRate = goalRate
     }
 
+    if (weight === undefined) {
+      interactionData.goalWeight = goalWeight
+    }
+
+    if (date === undefined) {
+      interactionData.goalDate = goalDate
+    }
     // if (weight === undefined) {
     //   interactionData.goalWeight = goalWeight
     // }
@@ -842,10 +851,24 @@ const UserInfo = () => {
     }
 
     // calculateMissingField()
-    // console.log(interactionData)
+    console.log(interactionData)
   }
 
-  const updateWeightFromDate = (goalDate: string) => {
+  const updateWeightFromDate = (goalDate: Date) => {
+    //string) => {
+    if (goalRate === 0 && goalWeight === 0) {
+      const dateInput = document.getElementById(
+        'date-input'
+      ) as HTMLInputElement
+
+      // dateInput.setCustomValidity('')
+
+      dateInput.setCustomValidity('The goal date must be in the future.')
+      dateInput.focus()
+      // dateInput.reportValidity()
+      console.log('logging22222')
+    }
+
     if (interactionData.previousInteraction === 'rate') {
       const today = new Date()
       if (today) {
@@ -912,7 +935,6 @@ const UserInfo = () => {
     } else if (interactionData.previousInteraction === 'weight') {
       // update rate
       setGoalRate(calculateGoalRateFromWeightAndDate(goalWeight, goalDate))
-      console.log(goalRate)
       if (unit === 'imperial') {
         if (goalInfo.goalSelection === 'lose') {
           setGoalRateLoseImperial(
@@ -950,6 +972,13 @@ const UserInfo = () => {
           )
         }
       }
+    } else if (
+      interactionData.lastInteraction === 'date' &&
+      // MAY BE NEEDED IN SOME FORM
+      // interactionData.previousInteraction === null &&
+      interactionData.goalWeight
+    ) {
+      calculateGoalRateFromWeightAndDate(goalWeight, goalDate)
     }
   }
 
@@ -962,7 +991,7 @@ const UserInfo = () => {
     if (goalDate && goalRate !== 0) {
       const parseGoalDate = new Date(goalDate)
       const weeksToTargetDate = calculateWeeksUntilDate(
-        parseGoalDate.toISOString()
+        parseGoalDate //.toISOString()
       )
       const rate = goalRate
 
@@ -992,8 +1021,9 @@ const UserInfo = () => {
   // Need to finish putting error message in here. Clean it up
   const calculateGoalRateFromWeightAndDate = (
     goalWeight: number,
-    goalDate: string
+    goalDate: Date //string
   ): number => {
+    console.log('here')
     if (goalDate && goalWeight > 0) {
       //isValidDate(goalDate) && goalWeight > 0) {
       const differenceInDays = calculateDifferenceInDays(goalDate)
@@ -1027,37 +1057,25 @@ const UserInfo = () => {
       const weightInput = document.getElementById(
         'lose-weight-input'
       ) as HTMLInputElement
+      const dateInput = document.getElementById(
+        'date-input'
+      ) as HTMLInputElement
       weightInput.setCustomValidity('')
-
+      dateInput.setCustomValidity('')
+      // console.log('goalDate: ', goalDate)
+      // console.log('goalWeight: ', goalWeight)
+      console.log('differenceInDays: ', differenceInDays)
       if (differenceInDays >= 0) {
         let tempGoalRate = 0
         if (goalInfo.goalSelection === 'lose') {
           tempGoalRate = (weight - goalWeight) / (differenceInDays / 7)
-
-          console.log(
-            'Before:',
-            weightInput.validity.valid,
-            weightInput.validity.rangeUnderflow
-          )
           if (tempGoalRate <= weight * 0.01 && tempGoalRate > 0) {
             return tempGoalRate
           } else {
             weightInput.setCustomValidity(
               'Goal weight is too low based on the rate and date.'
             )
-            console.log(
-              'After:',
-              weightInput.validity.valid,
-              weightInput.validity.rangeUnderflow
-            )
-            weightInput.reportValidity()
-            setTimeout(() => {
-              weightInput.focus()
-              console.log(
-                'Focused on weight input:',
-                document.activeElement === weightInput
-              )
-            }, 0)
+            weightInput.focus()
 
             return 0
           }
@@ -1071,8 +1089,12 @@ const UserInfo = () => {
         }
         return 0
       } else {
+        dateInput.setCustomValidity('The goal date must be in the future.')
+        dateInput.focus()
+        dateInput.reportValidity()
+        console.log('logging')
         // Put good error message in like window that says you have to have a name
-        throw new Error('The goal date must be in the future.')
+        // throw new Error('The goal date must be in the future.')
       }
     }
     return goalRate
@@ -1085,6 +1107,22 @@ const UserInfo = () => {
     if (interactionData.previousInteraction !== null) {
       weightInput.reportValidity()
     }
+  })
+
+  const dateInput = document.getElementById('date-input') as HTMLInputElement
+  // dateInput?.addEventListener('blur', () => {
+  //   if (interactionData.previousInteraction !== null) {
+  //     dateInput.reportValidity()
+  //   }
+  // })
+  dateInput?.addEventListener('focus', () => {
+    // if (
+    //   interactionData.previousInteraction === null
+    //   // &&
+    //   // interactionData.goalWeight
+    // ) {
+    dateInput.reportValidity()
+    // }
   })
 
   function handleBlurGoalWeight() {
@@ -1151,7 +1189,7 @@ const UserInfo = () => {
       )
       // console.log(goalRate, targetDate)
 
-      setGoalDate(targetDate.toISOString())
+      setGoalDate(targetDate) //.toISOString())
       setStatsInfo((prev) => ({
         ...prev,
         goalDate: targetDate.toISOString(),
@@ -1164,8 +1202,9 @@ const UserInfo = () => {
     }
   }
 
-  const calculateWeeksUntilDate = (goalDate: string): number => {
-    const today = new Date().toISOString()
+  const calculateWeeksUntilDate = (goalDate: Date): number => {
+    //string): number => {
+    const today = new Date() //.toISOString()
     if (goalDate) {
       //isValidDate(goalDate)) {
       if (goalDate > today) {
@@ -1179,7 +1218,8 @@ const UserInfo = () => {
     return 0
   }
 
-  function calculateDifferenceInDays(goalDate: string): number {
+  function calculateDifferenceInDays(goalDate: Date) {
+    //string): number {
     const newDate = new Date(goalDate)
     if (goalDate) {
       //isValidDate(goalDate)) {
@@ -1883,14 +1923,18 @@ const UserInfo = () => {
                     />
                     {unit === 'imperial' ? 'lbs' : 'kg'}
                     <DatePicker
+                      id="date-input"
                       className="date-picker-calendar"
-                      selected={new Date(goalDate)}
+                      selected={
+                        goalDate
+                        // goalDate !== '' ? new Date(goalDate) : new Date()
+                      }
                       onChange={(date, event) => {
                         event?.preventDefault()
-                        updateGoal(undefined, undefined, date?.toISOString())
+                        updateGoal(undefined, undefined, date) //?.toISOString())
                         if (date) {
-                          setGoalDate(date.toISOString())
-                          updateWeightFromDate(date.toISOString())
+                          setGoalDate(date) //.toISOString())
+                          updateWeightFromDate(date) //.toISOString())
                           setGoalInfo((prev) => ({
                             ...prev,
                             // goalWeight: prev.goalWeight,
@@ -1965,8 +2009,8 @@ const UserInfo = () => {
                       onChange={(date, event) => {
                         event?.preventDefault()
                         if (date) {
-                          setGoalDate(date.toISOString())
-                          updateWeightFromDate(date.toISOString())
+                          setGoalDate(date) //.toISOString())
+                          updateWeightFromDate(date) //.toISOString())
                           setGoalInfo((prev) => ({
                             ...prev,
                             // goalWeight: prev.goalWeight,
