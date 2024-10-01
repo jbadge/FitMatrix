@@ -1,22 +1,16 @@
 1. need help making 0.5 steps in lose fat with max being 10%
+1. default goal Date to a week away. use this date for minimum
+
+makes 0 when no future date?
 
 
 2. Need to refactor long code on TDEE pages
  
 
+3. Weight does not update in goal for new user first time
 
+4. Need signedouttdee to allow submissions over and over
 
-Weight does not update in goal for new user first time
-
-*Would height in feet and inches be cleaner?
-
-Implement WorkoutAnalysis
-
-Implement Measurements
-
-need signedouttdee to allow submissions over and over
-
-default goal Date to a week away. use this date for minimum
 
 does goalinfo bodyfatpercent need to be diff than statsinfo bodyfatpercent?
 
@@ -26,15 +20,17 @@ does statsinfo AND goalinfo need goaldate, etc?
 
 zindex of lose fat too high goes thru navbar
 
-Add something to track user using creating +4-7lbs
+Add something to track user using creatine +4-7lbs
 
 should body fat percent change based on the goal your setting in real time?
 
 move validation error message slightly
 How can i make goalWeight show pop up error AND change value? (currently isValidWeight)
 
+Implement WorkoutAnalysis
 
-
+Implement Measurements
+*Would height in feet and inches be cleaner?
 
 
 MEASUREMENTS.TSX

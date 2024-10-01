@@ -4,14 +4,14 @@ import { useMutation } from 'react-query'
 import { APIError, NewUserType } from '../types/types'
 
 async function submitNewUser(newUser: NewUserType) {
-  console.log('submitNewUser: ', newUser)
+  // console.log('submitNewUser: ', newUser)
 
   const response = await fetch('/api/Users', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(newUser),
   })
-  console.log(response)
+  // console.log(response)
   if (response.ok) {
     return response.json()
   } else {
@@ -59,7 +59,7 @@ export function SignUp() {
     (newUser: NewUserType) => submitNewUser(newUser),
     {
       onSuccess: function () {
-        console.log('newUser: ', newUser)
+        // console.log('newUser: ', newUser)
 
         navigate(`/users/${id}/Progress`)
       },
@@ -76,7 +76,7 @@ export function SignUp() {
     const fieldName = event.target.name
 
     const updatedUser = { ...newUser, [fieldName]: value }
-    console.log('updatedUser: ', updatedUser)
+    // console.log('updatedUser: ', updatedUser)
     setNewUser(updatedUser)
   }
 

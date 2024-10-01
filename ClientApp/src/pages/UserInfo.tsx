@@ -144,7 +144,7 @@ const UserInfo = () => {
   })
 
   const maxRangeLose = weight * 0.01
-  const maxRangeGain = 2
+  const maxRangeGain = unit === 'imperial' ? 2 : 0.91
   const effectiveLoss = Number(
     (maxRangeLose * (calculateDifferenceInDays(goalDate) / 7)).toFixed(1)
   )
@@ -183,20 +183,18 @@ const UserInfo = () => {
 
   const displayWeightValue = Math.round(weight * 10) / 10
 
-  const displayLoseWeightValue =
+  const displayGoalWeightValue =
     unit === 'imperial'
       ? lastFocusedInput === 'lose' ||
         lastFocusedInput === 'goalWeightLose' ||
         goalInfo.goalSelection === 'lose'
         ? goalWeightLoseImperial
         : goalWeightGainImperial
-      : lastFocusedInput === 'gain' ||
-          lastFocusedInput === 'goalWeightGain' ||
-          goalInfo.goalSelection === 'gain'
+      : lastFocusedInput === 'lose' ||
+          lastFocusedInput === 'goalWeightLose' ||
+          goalInfo.goalSelection === 'lose'
         ? goalWeightLoseMetric
         : goalWeightGainMetric
-
-  const displayGainWeightValue = Number(goalWeight.toFixed(1))
 
   // Maybe we do it this way instead of above methods
   const displayGoalRate =
@@ -206,9 +204,9 @@ const UserInfo = () => {
         goalInfo.goalSelection === 'lose'
         ? goalRateLoseImperial
         : goalRateGainImperial
-      : lastFocusedInput === 'gain' ||
-          lastFocusedInput === 'goalWeightGain' ||
-          goalInfo.goalSelection === 'gain'
+      : lastFocusedInput === 'lose' ||
+          lastFocusedInput === 'goalWeightLose' ||
+          goalInfo.goalSelection === 'lose'
         ? goalRateLoseMetric
         : goalRateGainMetric
 
@@ -217,63 +215,105 @@ const UserInfo = () => {
   /////////
   const toggleUnit = () => {
     setUnit((prevUnit) => {
-      const newUnit = prevUnit === 'metric' ? 'imperial' : 'metric'
+      const newUnit = prevUnit === 'imperial' ? 'metric' : 'imperial'
 
       // setGoalInfo((prev) => {
-      //   const newGoalWeightLoseMetric =
-      //     newUnit === 'metric'
-      //       ? prev.goalWeightMetric!
-      //       : prev.goalWeight!
-
       //   const newGoalWeightLoseImperial =
-      //     newUnit === 'metric'
-      //       ? prev.goalWeight!
-      //       : convertWeightToImperial(prev.goalWeight!)
+      //     newUnit === 'imperial'
+      //       ? prev.goalWeightGainImperial!
+      //       : convertWeightToImperial(prev.goalWeightGainMetric!)
 
-      //       const newGoalWeightGainMetric =
-      //     newUnit === 'metric'
-      //       ? prev.goalWeightMetric!
-      //       : prev.goalWeight!
+      //   const newGoalWeightLoseMetric =
+      //     newUnit === 'imperial'
+      //       ? convertWeightToMetric(prev.goalWeightGainImperial!)
+      //       : prev.goalWeightGainMetric!
 
       //   const newGoalWeightGainImperial =
-      //     newUnit === 'metric'
-      //       ? prev.goalWeight!
-      //       : convertWeightToImperial(prev.goalWeight!)
+      //     newUnit === 'imperial'
+      //       ? prev.goalWeightGainImperial!
+      //       : convertWeightToImperial(prev.goalWeightGainMetric!)
 
-      //   const newGoalRateLoseMetric =
-      //     newUnit === 'metric'
-      //       ? convertWeightToMetric(prev.goalRate!)
-      //       : prev.goalRate!
+      //   const newGoalWeightGainMetric =
+      //     newUnit === 'imperial'
+      //       ? convertWeightToMetric(prev.goalWeightGainImperial!)
+      //       : prev.goalWeightGainMetric!
 
       //   const newGoalRateLoseImperial =
-      //     newUnit === 'metric'
-      //       ? prev.goalRate!
-      //       : convertWeightToImperial(prev.goalRate!)
+      //     newUnit === 'imperial'
+      //       ? prev.goalRateLoseImperial!
+      //       : convertWeightToImperial(prev.goalRateLoseImperial!)
 
-      //       const newGoalRateGainMetric =
-      //       newUnit === 'metric'
-      //         ? convertWeightToMetric(prev.goalRate!)
-      //         : prev.goalRate!
+      //   const newGoalRateLoseMetric =
+      //     newUnit === 'imperial'
+      //       ? convertWeightToMetric(prev.goalRateLoseMetric!)
+      //       : prev.goalRateLoseMetric!
 
-      //     const newGoalRateGainImperial =
-      //       newUnit === 'metric'
-      //         ? prev.goalRate!
-      //         : convertWeightToImperial(prev.goalRate!)
+      //   const newGoalRateGainImperial =
+      //     newUnit === 'imperial'
+      //       ? prev.goalRateGainImperial!
+      //       : convertWeightToImperial(prev.goalRateGainImperial!)
 
-      // console.log(newGoalWeightMetric, newGoalWeightImperial)
+      //   const newGoalRateGainMetric =
+      //     newUnit === 'imperial'
+      //       ? convertWeightToMetric(prev.goalRateGainMetric!)
+      //       : prev.goalRateGainMetric!
 
-      //   setGoalRate(
-      //     newUnit === 'metric' ? newGoalRateMetric : newGoalRateImperial
+      //   console.log(
+      //     'New Goal Weight Lose (Imperial):',
+      //     newGoalWeightLoseImperial
       //   )
+      //   console.log('New Goal Weight Lose (Metric):', newGoalWeightLoseMetric)
+      //   console.log(
+      //     'New Goal Weight Gain (Imperial):',
+      //     newGoalWeightGainImperial
+      //   )
+      //   console.log('New Goal Weight Gain (Metric):', newGoalWeightGainMetric)
+      //   console.log('New Goal Rate Lose (Imperial):', newGoalRateLoseImperial)
+      //   console.log('New Goal Rate Lose (Metric):', newGoalRateLoseMetric)
+      //   console.log('New Goal Rate Gain (Imperial):', newGoalRateGainImperial)
+      //   console.log('New Goal Rate Gain (Metric):', newGoalRateGainMetric)
+
+      setGoalRate(
+        Number(
+          (newUnit === 'imperial'
+            ? goalInfo.goalSelection === 'lose'
+              ? goalInfo.goalRateLoseImperial!
+              : goalInfo.goalRateGainImperial!
+            : goalInfo.goalSelection === 'lose'
+              ? goalInfo.goalRateLoseMetric!
+              : goalInfo.goalRateGainMetric!
+          ).toFixed(1)
+        )
+      )
+      if (newUnit === 'imperial') {
+        if (goalInfo.goalSelection === 'lose') {
+          setGoalRate(goalRate)
+        } else if (goalInfo.goalSelection === 'gain') {
+          //
+        }
+      } else if (newUnit === 'metric') {
+        if (goalInfo.goalSelection === 'lose') {
+          //
+        } else if (goalInfo.goalSelection === 'gain') {
+          //
+        }
+      }
 
       //   setGoalWeight(
       //     newUnit === 'metric' ? newGoalWeightMetric : newGoalWeightImperial
       //   )
-      //   return {
-      //     ...prev,
-      //     goalWeight:
-      //       newUnit === 'metric' ? newGoalWeightMetric : newGoalWeightImperial,
-      //   }
+      // return {
+      //   ...prev,
+      //   goalWeightLoseImperial: newGoalWeightLoseImperial,
+      //   goalRateLoseImperial: newGoalRateLoseImperial,
+      //   goalWeightGainImperial: newGoalWeightGainImperial,
+      //   goalRateGainImperial: newGoalRateGainImperial,
+      //   goalWeightLoseMetric: newGoalWeightLoseMetric,
+      //   goalRateLoseMetric: newGoalRateLoseMetric,
+      //   goalWeightGainMetric: newGoalWeightGainMetric,
+      //   goalRateGainMetric: newGoalRateGainMetric,
+      //   // newUnit === 'metric' ? newGoalWeightMetric : newGoalWeightImperial,
+      // }
       // })
 
       setStatsInfo((prev) => {
@@ -381,7 +421,7 @@ const UserInfo = () => {
       return false
     }
 
-    console.log('true')
+    // console.log('true')
     return true
     // return goalWeight
   }
@@ -429,7 +469,7 @@ const UserInfo = () => {
     const numericValue = parseFloat(value)
     // console.log('name: ', name)
     // console.log('value: ', value)
-    // console.log('numeric value: ', numericValue)
+    console.log('numeric value: ', numericValue)
 
     switch (name) {
       case 'age':
@@ -574,152 +614,46 @@ const UserInfo = () => {
 
       case 'lose':
         updateGoal(undefined, goalRate)
+        // console.log('goalRate: ', goalRate)
         if (unit === 'imperial') {
           // Set Imperial Measurements
           setGoalRateLoseImperial(numericValue)
+          console.log(convertWeightToMetric(numericValue))
           setGoalRateLoseMetric(convertWeightToMetric(numericValue))
-          // setGoalWeightLoseImperial(
-          //   calculateGoalWeightFromRateAndDate(name, numericValue)
-          // )
-          // setGoalWeightLoseMetric(
-          //   convertWeightToMetric(
-          //     calculateGoalWeightFromRateAndDate(name, numericValue)
-          //   )
-          // )
-          // setGoalInfo((prevGoal) => ({
-          //   ...prevGoal,
-          //   goalSelection: name,
-          //   goalRateLoseImperial: numericValue,
-          //   goalRateLoseMetric: convertWeightToMetric(numericValue),
-          //   goalWeightLoseImperial: calculateGoalWeightFromRateAndDate(
-          //     name,
-          //     numericValue
-          //   ),
-          //   goalWeightLoseMetric: convertWeightToMetric(
-          //     calculateGoalWeightFromRateAndDate(name, numericValue)
-          //   ),
-          // }))
-        } else {
+          // set goalInfo for lose and gain
+        } else if (unit === 'metric') {
           // Set Metric Measurements
           setGoalRateLoseImperial(convertWeightToImperial(numericValue))
           setGoalRateLoseMetric(numericValue)
-          // setGoalWeightLoseImperial(
-          //   convertWeightToImperial(
-          //     calculateGoalWeightFromRateAndDate(name, numericValue)
-          //   )
-          // )
-          // setGoalWeightLoseMetric(
-          //   calculateGoalWeightFromRateAndDate(name, numericValue)
-          // )
-          // // Set GoalInfo Metric-based
-          // setGoalInfo((prevGoal) => ({
-          //   ...prevGoal,
-          //   goalSelection: name,
-          //   goalRateLoseImperial: convertWeightToImperial(numericValue),
-          //   goalRateLoseMetric: numericValue,
-          //   goalWeightLoseImperial: convertWeightToImperial(
-          //     calculateGoalWeightFromRateAndDate(name, numericValue)
-          //   ),
-          //   goalWeightLoseMetric: calculateGoalWeightFromRateAndDate(
-          //     name,
-          //     numericValue
-          //   ),
-          // }))
         }
         setGoalRate(numericValue)
-        // setGoalWeight(calculateGoalWeightFromRateAndDate(name, numericValue))
 
         setLastFocusedInput('lose')
-        // handleBlurGoalRate()
         break
 
       // need to update gain and goalWeightGain
       case 'gain':
-        // Rate
-        // setGoalRateGainMetric(numericValue)
-        // setGoalRateGainImperial(numericValue)
-        // setGoalRate(numericValue)
-        // // User
-        // setGoalInfo((prevGoal) => ({
-        //   ...prevGoal,
-        //   goalSelection: name,
-        //   goalRate: numericValue,
-        // }))
-        // Weight
-        // setGoalWeight(
-        //   unit === 'metric'
-        //     ? calculateGoalWeight(name, numericValue)
-        //     : convertWeightToImperial(calculateGoalWeight(name, numericValue))
-        // )
-        // unit === 'imperial'
-        //   ? setGoalWeightGainImperial(calculateGoalWeight(name, numericValue))
-        //   : setGoalWeightGainMetric(calculateGoalWeight(name, numericValue))
-
-        unit === 'imperial'
-          ? // Set Imperial Measurements
-            // Set Goal Rate Imperial-based
-            (setGoalRateGainImperial(numericValue),
-            setGoalRateGainMetric(convertWeightToMetric(numericValue)),
-            // Set Goal Weight Imperial-based
-            setGoalWeightGainImperial(
-              calculateGoalWeightFromRateAndDate(name, numericValue)
-            ),
-            setGoalWeightGainMetric(
-              convertWeightToMetric(
-                calculateGoalWeightFromRateAndDate(name, numericValue)
-              )
-            ),
-            // Set GoalInfo Imperial-based
-            setGoalInfo((prevGoal) => ({
-              ...prevGoal,
-              goalSelection: name,
-              goalRateGainImperial: numericValue,
-              goalRateGainMetric: convertWeightToMetric(numericValue),
-              goalWeightGainImperial: calculateGoalWeightFromRateAndDate(
-                name,
-                numericValue
-              ),
-              goalWeightGainMetric: convertWeightToMetric(
-                calculateGoalWeightFromRateAndDate(name, numericValue)
-              ),
-            })))
-          : // Set Metric Measurements
-            // Set Goal Rate Metric-based
-            (setGoalRateGainImperial(convertWeightToImperial(numericValue)),
-            setGoalRateGainMetric(numericValue),
-            // Set Goal Weight Metric-based
-            setGoalWeightGainImperial(
-              convertWeightToImperial(
-                calculateGoalWeightFromRateAndDate(name, numericValue)
-              )
-            ),
-            setGoalWeightGainMetric(
-              calculateGoalWeightFromRateAndDate(name, numericValue)
-            ),
-            // Set GoalInfo Metric-based
-            setGoalInfo((prevGoal) => ({
-              ...prevGoal,
-              goalSelection: name,
-              goalRateGainImperial: convertWeightToImperial(numericValue),
-              goalRateGainMetric: numericValue,
-              goalWeightGainImperial: convertWeightToImperial(
-                calculateGoalWeightFromRateAndDate(name, numericValue)
-              ),
-              goalWeightGainMetric: calculateGoalWeightFromRateAndDate(
-                name,
-                numericValue
-              ),
-            })))
-
+        updateGoal(undefined, goalRate)
+        if (unit === 'imperial') {
+          // Set Imperial Measurements
+          setGoalRateGainImperial(numericValue)
+          setGoalRateGainMetric(convertWeightToMetric(numericValue))
+          setGoalInfo((prev) => ({
+            ...prev,
+            goalRateGainImperial: numericValue,
+            goalRateGainMetric: convertWeightToMetric(numericValue),
+          }))
+        } else {
+          // Set Metric Measurements
+          setGoalRateGainImperial(convertWeightToImperial(numericValue))
+          setGoalRateGainMetric(numericValue)
+          setGoalInfo((prev) => ({
+            ...prev,
+            goalRateGainImperial: convertWeightToImperial(numericValue),
+            goalRateGainMetric: numericValue,
+          }))
+        }
         setGoalRate(numericValue)
-        setGoalWeight(calculateGoalWeightFromRateAndDate(name, numericValue))
-
-        // User
-        setGoalInfo((prevGoal) => ({
-          ...prevGoal,
-          goalSelection: name,
-          // goalRateLose: numericValue,
-        }))
 
         setLastFocusedInput('gain')
         break
@@ -756,20 +690,34 @@ const UserInfo = () => {
         break
 
       case 'goalWeightGain':
-        setGoalWeight(numericValue)
-        setGoalRate(calculateGoalRateFromWeightAndDate(numericValue, goalDate))
-        setGoalRateGainImperial(
-          calculateGoalRateFromWeightAndDate(numericValue, goalDate)
-        )
-        setGoalRateGainMetric(
-          calculateGoalRateFromWeightAndDate(numericValue, goalDate)
-        )
-        setGoalInfo((prevGoal) => ({
-          ...prevGoal,
-          goalRate: goalRate,
-        }))
+        // Set Imperial Measurements
+        if (unit === 'imperial') {
+          setGoalWeightGainImperial(numericValue)
+          setGoalWeightGainMetric(convertWeightToMetric(numericValue))
 
+          setGoalInfo((prevGoal) => ({
+            ...prevGoal,
+            goalSelection: 'gain',
+            goalWeightGainImperial: numericValue,
+            goalWeightGainMetric: convertWeightToMetric(numericValue),
+          }))
+        }
+        // Set Metric Measurements
+        else {
+          setGoalWeightGainImperial(convertWeightToImperial(numericValue))
+          setGoalWeightGainMetric(numericValue)
+
+          setGoalInfo((prevGoal) => ({
+            ...prevGoal,
+            goalSelection: 'gain',
+            goalWeightGainImperial: convertWeightToImperial(numericValue),
+            goalWeightGainMetric: numericValue,
+          }))
+        }
+
+        setGoalWeight(numericValue)
         setLastFocusedInput('goalWeightGain')
+
         break
 
       default:
@@ -805,7 +753,6 @@ const UserInfo = () => {
   // Update Functions
   ///////////////////
   function updateGoal(weight?: number, rate?: number, date?: Date | null) {
-    //string) {
     const currentInteraction = interactionData.lastInteraction
 
     let newInteraction: InteractionType = null
@@ -842,9 +789,6 @@ const UserInfo = () => {
     if (date === undefined) {
       interactionData.goalDate = goalDate
     }
-    // if (weight === undefined) {
-    //   interactionData.goalWeight = goalWeight
-    // }
 
     if (!interactionData.goalDate) {
       interactionData.goalDate = null
@@ -855,7 +799,8 @@ const UserInfo = () => {
   }
 
   const updateWeightFromDate = (goalDate: Date) => {
-    //string) => {
+    console.log('hiya')
+
     if (goalRate === 0 && goalWeight === 0) {
       const dateInput = document.getElementById(
         'date-input'
@@ -865,8 +810,6 @@ const UserInfo = () => {
 
       dateInput.setCustomValidity('The goal date must be in the future.')
       dateInput.focus()
-      // dateInput.reportValidity()
-      console.log('logging22222')
     }
 
     if (interactionData.previousInteraction === 'rate') {
@@ -876,24 +819,48 @@ const UserInfo = () => {
         let differenceInDays = 0
         let totalAmount = 0
         let targetWeight = 0
-        console.log('goalWeight: ', goalWeight)
+        // console.log('goalWeight: ', goalWeight)
 
         differenceInDays = calculateWeeksUntilDate(goalDate)
         totalAmount = goalRate * differenceInDays
-        targetWeight = weight - totalAmount
-        console.log('targetWeight: ', targetWeight)
+        console.log('weight: ', weight, 'totalAmount: ', totalAmount)
+        if (unit === 'imperial') {
+          if (goalInfo.goalSelection === 'lose') {
+            targetWeight = weight - totalAmount
+          } else if (goalInfo.goalSelection === 'gain') {
+            targetWeight = weight + totalAmount
+          }
+        } else if (unit === 'metric') {
+          if (goalInfo.goalSelection === 'lose') {
+            console.log(weight, totalAmount)
+            targetWeight = weight - totalAmount
+          } else if (goalInfo.goalSelection === 'gain') {
+            console.log(weight, totalAmount)
+
+            targetWeight = weight + totalAmount
+          }
+        }
+        // targetWeight =
+        //   unit === 'imperial'
+        //     ? goalInfo.goalSelection === 'lose'
+        //       ? weight - totalAmount
+        //       : weight + totalAmount
+        //     : goalInfo.goalSelection === 'lose'
+        //       ? convertWeightToMetric(weight) - totalAmount
+        //       : convertWeightToMetric(weight) + totalAmount
 
         // targetWeight =
         // unit === 'metric' ? goalWeight : convertHeightToImperial(goalWeight)
 
         // SET ONE FOR LOSE AND ONE FOR GAIN
-        setGoalWeight(
-          unit === 'imperial'
-            ? targetWeight
-            : convertWeightToMetric(targetWeight)
-        )
+        // setGoalWeight(
+        //   unit === 'imperial'
+        //     ? targetWeight
+        //     : convertWeightToMetric(targetWeight)
+        // )
         if (unit === 'imperial') {
           if (goalInfo.goalSelection === 'lose') {
+            setGoalWeight(targetWeight)
             setGoalWeightLoseImperial(targetWeight)
             setGoalWeightLoseMetric(convertWeightToMetric(targetWeight))
             setGoalInfo((prev) => ({
@@ -902,6 +869,7 @@ const UserInfo = () => {
               goalWeightLoseMetric: convertWeightToMetric(targetWeight),
             }))
           } else if (goalInfo.goalSelection === 'gain') {
+            setGoalWeight(targetWeight)
             setGoalWeightGainImperial(targetWeight)
             setGoalWeightGainMetric(convertWeightToMetric(targetWeight))
             setGoalInfo((prev) => ({
@@ -911,6 +879,7 @@ const UserInfo = () => {
             }))
           }
         } else if (unit === 'metric') {
+          console.log('h2h2h2')
           if (goalInfo.goalSelection === 'lose') {
             setGoalWeightLoseMetric(targetWeight)
             setGoalWeightLoseImperial(convertWeightToImperial(targetWeight))
@@ -920,6 +889,9 @@ const UserInfo = () => {
               goalWeightLoseMetric: targetWeight,
             }))
           } else if (goalInfo.goalSelection === 'gain') {
+            console.log('hsjhkfjs')
+            console.log('targetWeight in gain: ', targetWeight)
+            console.log('goalRate: ', goalRate, 'goalWeight: ', goalWeight)
             setGoalWeightGainMetric(targetWeight)
             setGoalWeightGainImperial(convertWeightToImperial(targetWeight))
             setGoalInfo((prev) => ({
@@ -963,6 +935,7 @@ const UserInfo = () => {
             )
           )
         } else if (goalInfo.goalSelection === 'gain') {
+          console.log(goalWeight)
           setGoalRateGainMetric(
             Number(
               calculateGoalRateFromWeightAndDate(goalWeight, goalDate).toFixed(
@@ -987,20 +960,35 @@ const UserInfo = () => {
     goal: string,
     goalRate: number
   ): number => {
+    console.log('calculateGoalWeightFromRateAndDate')
     // console.log('weight: ', weight, 'goalRate: ', goalRate)
     if (goalDate && goalRate !== 0) {
       const parseGoalDate = new Date(goalDate)
-      const weeksToTargetDate = calculateWeeksUntilDate(
-        parseGoalDate //.toISOString()
-      )
+      const weeksToTargetDate = calculateWeeksUntilDate(parseGoalDate)
       const rate = goalRate
 
       const targetWeight =
-        goal === 'lose'
-          ? Number((weight - weeksToTargetDate * rate).toFixed(1))
-          : Number((weight + weeksToTargetDate * rate).toFixed(1))
+        unit === 'imperial'
+          ? goal === 'lose'
+            ? Number((weight - weeksToTargetDate * rate).toFixed(1))
+            : Number((weight + weeksToTargetDate * rate).toFixed(1))
+          : goal === 'lose'
+            ? Number(
+                (
+                  convertWeightToMetric(weight) -
+                  weeksToTargetDate * rate
+                ).toFixed(1)
+              )
+            : Number(
+                (
+                  convertWeightToMetric(weight) +
+                  weeksToTargetDate * rate
+                ).toFixed(1)
+              )
 
       // console.log(
+      //   'goal: ',
+      //   goal,
       //   'targetWeight: ',
       //   targetWeight,
       //   'weeksToTargetDate: ',
@@ -1110,19 +1098,8 @@ const UserInfo = () => {
   })
 
   const dateInput = document.getElementById('date-input') as HTMLInputElement
-  // dateInput?.addEventListener('blur', () => {
-  //   if (interactionData.previousInteraction !== null) {
-  //     dateInput.reportValidity()
-  //   }
-  // })
   dateInput?.addEventListener('focus', () => {
-    // if (
-    //   interactionData.previousInteraction === null
-    //   // &&
-    //   // interactionData.goalWeight
-    // ) {
     dateInput.reportValidity()
-    // }
   })
 
   function handleBlurGoalWeight() {
@@ -1255,7 +1232,7 @@ const UserInfo = () => {
         const daysToTargetWeight = calculateDifferenceInDays(goalDate)
         const weeksToTargetWeight = daysToTargetWeight / 7
         const targetWeight = weight - goalRate * weeksToTargetWeight
-        console.log('targetWeight: ', targetWeight)
+        // console.log('targetWeight: ', targetWeight)
         setGoalWeight(targetWeight)
         if (unit === 'metric') {
           //////////////////
@@ -1327,45 +1304,88 @@ const UserInfo = () => {
   }
 
   function handleBlurGoalRate() {
+    console.log('handleBlurGoalRate')
     if (
       (interactionData.previousInteraction === 'date' ||
         interactionData.previousInteraction === null) &&
       goalRate >= 0
     ) {
+      // SOME ERROR HAPPENING IN THIS BLOCK
+      /////////////////////////////////////
+      console.log('measurement: ', unit, 'goalRate: ', goalRate)
       if (unit === 'imperial') {
         // Set Imperial Measurements
-        setGoalWeightLoseImperial(
-          calculateGoalWeightFromRateAndDate(goalInfo.goalSelection!, goalRate)
-        )
-        setGoalWeightLoseMetric(
-          convertWeightToMetric(
+        if (goalInfo.goalSelection === 'lose') {
+          setGoalWeightLoseImperial(
             calculateGoalWeightFromRateAndDate(
               goalInfo.goalSelection!,
               goalRate
             )
           )
-        )
-        setGoalInfo((prevGoal) => ({
-          ...prevGoal,
-          goalSelection: goalInfo.goalSelection!,
-          goalRateLoseImperial: goalRate,
-          goalRateLoseMetric: convertWeightToMetric(
+
+          console.log('goalRate: ', goalRate)
+          setGoalWeightLoseMetric(
+            // convertWeightToMetric(
+            calculateGoalWeightFromRateAndDate(
+              goalInfo.goalSelection!,
+              goalRate
+              // )
+            )
+          )
+          setGoalInfo((prevGoal) => ({
+            ...prevGoal,
+            goalSelection: goalInfo.goalSelection!,
+            // goalRateLoseImperial: goalRate,
+            // goalRateLoseMetric: convertWeightToMetric(
+            //   calculateGoalWeightFromRateAndDate(
+            //     goalInfo.goalSelection!,
+            //     goalRate
+            //   )
+            // ),
+            goalWeightLoseImperial: calculateGoalWeightFromRateAndDate(
+              goalInfo.goalSelection!,
+              goalRate
+            ),
+            goalWeightLoseMetric: convertWeightToMetric(
+              calculateGoalWeightFromRateAndDate(
+                goalInfo.goalSelection!,
+                goalRate
+              )
+            ),
+          }))
+        } else if (goalInfo.goalSelection === 'gain') {
+          console.log('here')
+          setGoalWeightGainImperial(
             calculateGoalWeightFromRateAndDate(
               goalInfo.goalSelection!,
               goalRate
             )
-          ),
-          goalWeightLoseImperial: calculateGoalWeightFromRateAndDate(
-            goalInfo.goalSelection!,
-            goalRate
-          ),
-          goalWeightLoseMetric: convertWeightToMetric(
-            calculateGoalWeightFromRateAndDate(
+          )
+          setGoalWeightGainMetric(
+            convertWeightToMetric(
+              calculateGoalWeightFromRateAndDate(
+                goalInfo.goalSelection!,
+                goalRate
+              )
+            )
+          )
+          setGoalInfo((prevGoal) => ({
+            ...prevGoal,
+            goalSelection: goalInfo.goalSelection!,
+            goalRateGainImperial: goalRate,
+            goalRateGainMetric: convertWeightToMetric(goalRate),
+            goalWeightGainImperial: calculateGoalWeightFromRateAndDate(
               goalInfo.goalSelection!,
               goalRate
-            )
-          ),
-        }))
+            ),
+            goalWeightGainMetric: convertWeightToMetric(
+              calculateGoalWeightFromRateAndDate(
+                goalInfo.goalSelection!,
+                goalRate
+              )
+            ),
+          }))
+        }
       } else {
         // Set Metric Measurements
         setGoalWeightLoseImperial(
@@ -1382,24 +1402,24 @@ const UserInfo = () => {
         setGoalInfo((prevGoal) => ({
           ...prevGoal,
           goalSelection: goalInfo.goalSelection!,
-          goalRateLoseImperial: convertWeightToImperial(goalRate),
-          goalRateLoseMetric: goalRate,
-          goalWeightLoseImperial: convertWeightToImperial(
-            calculateGoalWeightFromRateAndDate(
-              goalInfo.goalSelection!,
-              goalRate
-            )
-          ),
+          // goalRateLoseImperial: convertWeightToImperial(goalRate),
+          // goalRateLoseMetric: goalRate,
+          // goalWeightLoseImperial: convertWeightToImperial(
+          //   calculateGoalWeightFromRateAndDate(
+          //     goalInfo.goalSelection!,
+          //     goalRate
+          //   )
+          // ),
           goalWeightLoseMetric: calculateGoalWeightFromRateAndDate(
             goalInfo.goalSelection!,
             goalRate
           ),
         }))
-
         setGoalWeight(
           calculateGoalWeightFromRateAndDate(goalInfo.goalSelection!, goalRate)
         )
       }
+      /////////////////////////////////////
     } else if (
       interactionData.previousInteraction === 'weight' &&
       goalRate >= 0
@@ -1576,7 +1596,6 @@ const UserInfo = () => {
         }
 
         const user = await response.json()
-        // console.log(user)
         if (user) {
           const stats =
             user.stats && user.stats.length > 0
@@ -1587,7 +1606,6 @@ const UserInfo = () => {
               ? user.goal[user.goal.length - 1]
               : undefined
 
-          /// Need to implement correctly
           // Set stats
           if (stats) {
             delete stats.id
@@ -1617,7 +1635,6 @@ const UserInfo = () => {
           // Set goals
           if (goal) {
             delete goal.id
-            // console.log(user)
             setGoalInfo({
               ...goal,
               userId: user.id,
@@ -1628,26 +1645,6 @@ const UserInfo = () => {
               gain: goal.goalSelection === 'gain',
               maintain: goal.goalSelection === 'maintain',
             })
-
-            // if (goal.goalSelection === 'imperial') {
-            //   if (goal.goalWeightLoseImperial <= stats.weightImperial) {
-            //     setGoalWeightLoseImperial(goal.goalWeightImperial)
-            //     setGoalWeightLoseMetric(goal.goalWeightLoseMetric)
-            //   } else if (goal.goalWeightGainImperial > stats.weightImperial) {
-            //     setGoalWeightGainImperial(goal.goalWeightImperial)
-            //     setGoalWeightGainMetric(goal.goalWeightGainMetric)
-            //   }
-            // }
-
-            // if (unit === 'imperial') {
-            //   if (goal.goalSelection === 'lose') {
-            //     setGoalRate(goal.goalRateLoseImperial)
-            //     setGoalWeight(goal.goalWeightLoseImperial)
-            //   } else {
-            //     setGoalRate(goal.goalRateGainImperial)
-            //     setGoalWeight(goal.goalWeightGainImperial)
-            //   }
-            // }
 
             unit === 'imperial'
               ? goal.goalSelection === 'lose'
@@ -1661,19 +1658,16 @@ const UserInfo = () => {
                 : (setGoalRate(goal.goalRateGainMetric),
                   setGoalWeight(goal.goalWeightGainMetric))
 
-            // if (goal.goalSelection === 'lose') {
             setGoalRateLoseMetric(goal.goalRateLoseMetric)
             setGoalRateLoseImperial(goal.goalRateLoseImperial)
             setGoalWeightLoseMetric(goal.goalWeightLoseMetric)
             setGoalWeightLoseImperial(goal.goalWeightLoseImperial)
-            // } else if (goal.goalSelection === 'gain') {
+
             setGoalRateGainMetric(goal.goalRateGainMetric)
             setGoalRateGainImperial(goal.goalRateGainImperial)
             setGoalWeightGainMetric(goal.goalWeightGainMetric)
             setGoalWeightGainImperial(goal.goalWeightGainImperial)
-            // }
             setGoalDate(goal.goalDate)
-            // setBodyFatPercent(goal.bodyFatPercent)
           }
         }
       } catch (error) {
@@ -1834,7 +1828,7 @@ const UserInfo = () => {
                 placeholder="Weight"
                 value={displayWeightValue || ''}
                 onChange={handleInputChange}
-                onBlur={handleBlurGoalWeight}
+                // onBlur={handleBlurGoalWeight}
               />
             </div>
             <div className="form-input">
@@ -1916,7 +1910,7 @@ const UserInfo = () => {
                       min={minLoseWeight}
                       max={weight}
                       step="0.1"
-                      value={displayLoseWeightValue || ''}
+                      value={displayGoalWeightValue || ''}
                       onChange={handleInputChange}
                       onBlur={handleBlurGoalWeight}
                       required
@@ -1925,19 +1919,15 @@ const UserInfo = () => {
                     <DatePicker
                       id="date-input"
                       className="date-picker-calendar"
-                      selected={
-                        goalDate
-                        // goalDate !== '' ? new Date(goalDate) : new Date()
-                      }
+                      selected={goalDate}
                       onChange={(date, event) => {
                         event?.preventDefault()
-                        updateGoal(undefined, undefined, date) //?.toISOString())
+                        updateGoal(undefined, undefined, date)
                         if (date) {
-                          setGoalDate(date) //.toISOString())
-                          updateWeightFromDate(date) //.toISOString())
+                          setGoalDate(date)
+                          updateWeightFromDate(date)
                           setGoalInfo((prev) => ({
                             ...prev,
-                            // goalWeight: prev.goalWeight,
                             goalDate: date.toISOString(),
                           }))
                         }
@@ -1953,9 +1943,9 @@ const UserInfo = () => {
                     step="0.1"
                     className="slider-input"
                     value={
-                      unit === 'metric'
-                        ? goalRateLoseMetric
-                        : goalRateLoseImperial
+                      unit === 'imperial'
+                        ? goalRateLoseImperial
+                        : goalRateLoseMetric
                     }
                     onChange={handleInputChange}
                   />
@@ -1989,7 +1979,6 @@ const UserInfo = () => {
                   />
                   {unit === 'imperial' ? 'lbs' : 'kg'}
                   <div className="date-picker-goal">
-                    {/* Is janky, needs fixing. it re-renders upon clicking date */}
                     <input
                       className="goal-weight"
                       type="number"
@@ -1998,25 +1987,25 @@ const UserInfo = () => {
                       min={weight}
                       max={maxGainWeight}
                       step="0.1"
-                      value={displayGainWeightValue || ''}
+                      value={displayGoalWeightValue || ''}
                       onChange={handleInputChange}
                       onBlur={handleBlurGoalWeight}
                     />
                     {unit === 'imperial' ? 'lbs' : 'kg'}
                     <DatePicker
+                      id="date-input"
                       className="date-picker-calendar"
-                      selected={new Date(goalDate)}
+                      selected={goalDate}
                       onChange={(date, event) => {
                         event?.preventDefault()
+                        updateGoal(undefined, undefined, date)
                         if (date) {
-                          setGoalDate(date) //.toISOString())
-                          updateWeightFromDate(date) //.toISOString())
+                          setGoalDate(date)
+                          updateWeightFromDate(date)
                           setGoalInfo((prev) => ({
                             ...prev,
-                            // goalWeight: prev.goalWeight,
                             goalDate: date.toISOString(),
                           }))
-                          handleCheckboxChange('gain')
                         }
                       }}
                       onBlur={handleBlurGoalDate}
@@ -2027,12 +2016,12 @@ const UserInfo = () => {
                     name="gain"
                     min="0"
                     max={maxRangeGain}
-                    step="0.5"
+                    step={unit === 'imperial' ? '0.5' : '.2275'}
                     className="slider-input"
                     value={
-                      unit === 'metric'
-                        ? goalRateGainMetric
-                        : goalRateGainImperial
+                      unit === 'imperial'
+                        ? goalRateGainImperial
+                        : goalRateGainMetric
                     }
                     onChange={handleInputChange}
                   />
