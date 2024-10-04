@@ -3,8 +3,13 @@
 
 makes 0 when no future date?
 
+MAKE ANOTHER GOAL DATE (one for loss one for gain)
+
 
 2. Need to refactor long code on TDEE pages
+ 
+ use cases
+ if only 1 goalWeight and other was never checked, would it load up weight for the empty 1 but old value for the selected 1?
  
 
 3. Weight does not update in goal for new user first time

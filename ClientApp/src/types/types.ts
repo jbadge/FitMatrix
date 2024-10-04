@@ -64,7 +64,7 @@ export type GoalType = {
   goalRateGainMetric?: number
 
   goalBfp?: number
-  goalDate?: string
+  goalDate?: Date
 }
 
 export type ProgressType = {

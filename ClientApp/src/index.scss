@@ -370,6 +370,16 @@ footer {
 //   margin-right: auto;
 // }
 
+// input#lose-weight-input {
+//   position: relative;
+//   background-color: red;
+// }
+// input#lose-weight-input::after {
+//   background-color: red;
+// }
+// input#lose-weight-input::before {
+//   background-color: red;
+// }
 // input:invalid {
 //   // margin-top: 40px !important;
 //   // margin-left: 100px !important;
@@ -459,15 +469,16 @@ form {
       max-width: 200px;
       align-items: center;
     }
-    .user-goals {
+    .goal-heading {
       padding-top: 3rem;
+      text-align: center;
+      font-size: 20px;
+      margin: 0;
+    }
+    .user-goals {
+      // padding-top: 3rem;
       font-size: 14px;
       overflow: visible;
-      .goal-heading {
-        text-align: center;
-        font-size: 20px;
-        margin: 0;
-      }
       & label {
         position: relative;
         display: flex;
