@@ -36,8 +36,8 @@ namespace FitMatrix.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
-            // Find the pet in the database using `FindAsync` to look it up by id
-            // var pet = await _context.Pets.FindAsync(id);
+            // Find the user in the database using `FindAsync` to look it up by id
+            // var user = await _context.Users.FindAsync(id);
             var user = await _context.Users.Include(user => user.Stats).Include(user => user.Goal).Include(user => user.Progress).FirstOrDefaultAsync(x => x.Id == id);
 
             // If we didn't find anything, we receive a `null` in return
@@ -145,7 +145,6 @@ namespace FitMatrix.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Stats>> CreateStatsForUser(int userId, Stats stats)
         {
-            // stats.UserId = GetCurrentUserId();
             var user = await _context.Users.FindAsync(userId);
 
             if (user == null)
@@ -158,7 +157,7 @@ namespace FitMatrix.Controllers
             return CreatedAtAction("GetStats", new { id = stats.Id }, stats);
         }
 
-        // Add stats to a user
+        // Add measurements to a user
         // POST: /api/Users/5/Measurements
         [HttpPost("{userId}/measurements")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -189,11 +188,36 @@ namespace FitMatrix.Controllers
             {
                 return NotFound();
             }
-            _context.Goal.Add(goal);
+            _context.Goals.Add(goal);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGoal", new { id = goal.Id }, goal);
         }
+
+        // GET: api/Users/5/Progress
+        //
+        // Fetches and returns a specific user by finding it by id. The id is specified in the
+        // URL. In the sample URL above it is the `5`.  The "{id}" in the [HttpGet("{id}")] is what tells dotnet
+        // to grab the id from the URL. It is then made available to us as the `id` argument to the method.
+        //
+        // [HttpGet("{userId}/progress")]
+        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        // public async Task<ActionResult<User>> GetProgressFromUser(int id)
+        // {
+        //     // Find the user's progress in the database using `FindAsync` to look it up by id
+        //     // var user = await _context.Users.FindAsync(id);
+        //     var user = await _context.Users.Include(user => user.Stats).Include(user => user.Goal).Include(user => user.Progress).FirstOrDefaultAsync(x => x.Id == id);
+
+        //     // If we didn't find anything, we receive a `null` in return
+        //     if (user == null)
+        //     {
+        //         // Return a `404` response to the client indicating we could not find a user with this id
+        //         return NotFound();
+        //     }
+
+        //     // Return the user as a JSON object.
+        //     return user;
+        // }
 
         // Add progress to a user
         // POST: /api/Users/5/Progress
@@ -201,15 +225,14 @@ namespace FitMatrix.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Progress>> CreateProgressForUser(int userId, Progress progress)
         {
-            // progress.UserId = GetCurrentUserId();
             var user = await _context.Users.FindAsync(userId);
+
             if (user == null)
             {
                 return NotFound();
             }
             _context.Progress.Add(progress);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction("GetProgress", new { id = progress.Id }, progress);
         }
 

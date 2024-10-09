@@ -4,10 +4,11 @@ import { authHeader } from '../types/auth'
 import { useParams } from 'react-router'
 import { useMutation } from 'react-query'
 
-async function submitProgress(id: number, entry: ProgressType) {
-  // const userId = Number(id)
+async function submitProgress(entry: ProgressType) {
+  const id = entry.userId
   console.log('id: ', entry)
-  const response = await fetch(`/api/Users/${id}/progress`, {
+
+  const response = await fetch(`/api/Users/${id}/Progress`, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -32,7 +33,7 @@ const Progress = () => {
   const activityLevel = 1.2
 
   const [errorMessage, setErrorMessage] = React.useState('')
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(true)
   const [selectedFilter, setSelectedFilter] = useState('TDEE')
   const [unit, setUnit] = useState('imperial')
   const [calories, setCalories] = useState(1500)
@@ -83,9 +84,10 @@ const Progress = () => {
   })
 
   const createProgressMutation = useMutation(
-    (progress: ProgressType) => submitProgress(Number(id), progress),
+    (progress: ProgressType) => submitProgress(progress),
     {
       onSuccess: function () {
+        console.log('Progress submitted successfully')
         // navigate('/')
       },
       onError: function (apiError: APIError) {
@@ -97,7 +99,7 @@ const Progress = () => {
   // Stats
   //////
   // TDEECALC is done with Progress Table
-  const tdeeCalc = 0
+  const [tdeeCalc, setTdeeCalc] = useState(0)
   // Steps is brought in from device
   const steps = 0
 
@@ -120,13 +122,24 @@ const Progress = () => {
 
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-
+    console.log(progress)
     if (progress) {
       calculateResults(progress)
       setIsSubmitted(true)
     }
 
-    createProgressMutation.mutate(progress)
+    try {
+      await Promise.all([
+        (progress.userId = Number(id)),
+        createProgressMutation.mutate(progress),
+      ])
+
+      // navigate(`/users/${id}`)
+    } catch (error) {
+      console.error('Error submitting progress:', error)
+    }
+
+    // createProgressMutation.mutate(progress)
   }
 
   // Speed up testing
@@ -407,98 +420,154 @@ const Progress = () => {
     setTdeeKatch(tdeeKatchCalc)
   }
 
+  // const calculateTdee = () => {}
+
   // Get user and load data if data is in db
   useEffect(() => {
-    console.log('useEffect, fetching...')
-    const fetchUserData = async () => {
+    // console.log('useEffect, fetching...')
+
+    async function fetchUserData() {
       try {
         const response = await fetch(`/api/Users/${id}`, {
           headers: {
             Authorization: authHeader(),
           },
         })
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
 
         const user = await response.json()
-        if (user) {
-          const stats =
-            user.stats && user.stats.length > 0
-              ? user.stats[user.stats.length - 1]
-              : undefined
-          // const goal =
-          //   user.goal && user.goal.length > 0
-          //     ? user.goal[user.goal.length - 1]
-          //     : undefined
+        if (!user) return
 
-          // Set stats
-          if (stats) {
-            delete stats.id
-            setStatsInfo({
-              ...stats,
-              userId: user.id,
-            })
-            setAge(stats.age || '')
-            // setDateOfBirth(stats.doB)
-            // if (stats.doB) {
-            //   const dob = new Date(stats.doB)
-            //   setMonth(dob.getMonth() + 1)
-            //   setDay(dob.getDate())
-            //   setYear(dob.getFullYear())
-            // }
+        let progressEntryArray: ProgressType[] = user.progress || []
+        let sortedProgressEntryArray = [...progressEntryArray].sort(
+          (a, b) => a.id! - b.id!
+        )
 
-            setSex(stats.sex || '')
-            // setHeight(stats.statsInfo.heightImperial || '')
-            // setWeight(stats.weightImperial || '')
-            // setActivityLevelLabel(stats.activityLevelLabel || '')
-            setBodyFatPercent(stats.bodyFatPercent || '')
-            if (stats.bodyFatPercent !== 0) {
-              // setChecked(true)
-            }
-          }
+        const stats = user.stats?.slice(-1)[0]
 
-          // Set goals
-          // if (goal) {
-          //   delete goal.id
-          //   setGoalInfo({
-          //     ...goal,
-          //     userId: user.id,
-          //   })
+        loadProgressData(sortedProgressEntryArray)
 
-          //   setCheckedGoals({
-          //     lose: goal.goalSelection === 'lose',
-          //     gain: goal.goalSelection === 'gain',
-          //     maintain: goal.goalSelection === 'maintain',
-          //   })
-
-          // unit === 'imperial'
-          //   ? goal.goalSelection === 'lose'
-          //     ? (setGoalRate(goal.goalRateLoseImperial),
-          //       setGoalWeight(goal.goalWeightLoseImperial))
-          //     : (setGoalRate(goal.goalRateGainImperial),
-          //       setGoalWeight(goal.goalWeightGainImperial))
-          //   : goal.goalSelection === 'lose'
-          //     ? (setGoalRate(goal.goalRateLoseMetric),
-          //       setGoalWeight(goal.goalWeightLoseMetric))
-          //     : (setGoalRate(goal.goalRateGainMetric),
-          //       setGoalWeight(goal.goalWeightGainMetric))
-
-          // setGoalRateLoseImperial(goal.goalRateLoseImperial)
-          // setGoalRateLoseMetric(goal.goalRateLoseMetric)
-          // setGoalWeightLoseImperial(goal.goalWeightLoseImperial)
-          // setGoalWeightLoseMetric(goal.goalWeightLoseMetric)
-          // setGoalRateGainImperial(goal.goalRateGainImperial)
-          // setGoalRateGainMetric(goal.goalRateGainMetric)
-          // setGoalWeightGainImperial(goal.goalWeightGainImperial)
-          // setGoalWeightGainMetric(goal.goalWeightGainMetric)
-          // setGoalDate(goal.goalDate)
-          // }
+        if (stats) {
+          setStatsInfo({
+            ...stats,
+            userId: user.id,
+          })
+          setAge(stats.age || '')
+          setSex(stats.sex || '')
+          setBodyFatPercent(stats.bodyFatPercent || '')
         }
       } catch (error) {
         console.error('Error fetching user data:', error)
       }
     }
+
+    function loadProgressData(sortedProgressEntryArray: ProgressType[]) {
+      if (sortedProgressEntryArray.length === 0) return
+
+      const entryCount = sortedProgressEntryArray.length
+
+      // if (entryCount === 0) {
+      //   return
+      // }
+
+      // Grab progress
+      if (entryCount === 0) {
+        // Check the math that this works
+        const tempValue = Math.round((statsInfo.weightImperial * 13) / 5) * 5
+        // console.log(tempValue)
+        setTdeeCalc(tempValue)
+      }
+
+      if (entryCount < 7) {
+        const firstEntry = sortedProgressEntryArray[0]
+        if (firstEntry.progressWeightImperial !== undefined) {
+          const tempValue =
+            Math.round((firstEntry.progressWeightImperial * 13) / 5) * 5
+          // console.log(tempValue)
+          setTdeeCalc(tempValue)
+        } else {
+          console.log(
+            'First entry does not have progressWeightImperial defined'
+          )
+        }
+      } else {
+        sortedProgressEntryArray =
+          entryCount > 84
+            ? sortedProgressEntryArray.slice(-84)
+            : sortedProgressEntryArray
+      }
+
+      const weeks = weekArray(sortedProgressEntryArray, 7)
+
+      // let startingWeight =
+      //   unit === 'imperial'
+      //     ? sortedProgressEntryArray[0].progressWeightImperial || 0
+      //     : sortedProgressEntryArray[0].progressWeightMetric || 0
+
+      // For TESTING
+      let startingWeight = 197.2
+
+      const results: number[] = []
+
+      weeks.forEach((week) => {
+        if (week.length > 0) {
+          const totalCalories = week.reduce(
+            (total, { calories = 0 }) => total + calories,
+            0
+          )
+          const totalWeight =
+            unit === 'imperial'
+              ? week.reduce(
+                  (total, { progressWeightImperial = 0 }) =>
+                    total + progressWeightImperial,
+                  0
+                )
+              : week.reduce(
+                  (total, { progressWeightMetric = 0 }) =>
+                    total + progressWeightMetric,
+                  0
+                )
+          const averageCalories = Math.round(
+            week.length ? totalCalories / week.length : 0
+          )
+          const averageWeight = week.length ? totalWeight / week.length : 0
+          // console.log('averageCalories: ', averageCalories)
+          // console.log('averageWeight: ', averageWeight)
+          // console.log('startingWeight: ', startingWeight)
+
+          const deltaWeight = averageWeight - startingWeight
+
+          let tempTdee = averageCalories + (deltaWeight * -3500) / 7
+          // console.log('rounded tempTDEE: ', tempTdee)
+          startingWeight = averageWeight
+          results.push(tempTdee)
+          const resultsTdee =
+            Math.round(
+              results.reduce((total, curr) => total + curr, 0) /
+                results.length /
+                5
+            ) * 5
+          results.pop()
+          results.push(resultsTdee)
+          console.log('results: ', results)
+          console.log(Math.round(resultsTdee / 25) * 25)
+          setTdeeCalc(Math.round(resultsTdee / 25) * 25)
+          console.log(sortedProgressEntryArray)
+        }
+      })
+    }
+
+    const weekArray = (array: ProgressType[], weekSize: number) => {
+      const weeks = []
+      for (let i = 0; i < array.length; i += weekSize) {
+        weeks.push(array.slice(i, i + weekSize))
+      }
+      return weeks
+    }
+
     fetchUserData()
   }, [])
 
@@ -617,6 +686,14 @@ const Progress = () => {
                 <br />
                 All metabolic expenditure formulas report in Kcal/day.
               </p>
+              {isSubmitted && tdeeCalc !== 0 && (
+                <div className="result-row">
+                  <div className="result-label">
+                    TDEE (Calculated with logged calories and weight):
+                  </div>
+                  <div className="result-value">{tdeeCalc.toFixed(0)}</div>
+                </div>
+              )}
               <div className="result-row">
                 <div className="result-label">
                   TDEE (Mifflin St. Jeor Formula):
@@ -631,14 +708,6 @@ const Progress = () => {
                 <div className="result-value">{tdeeKatch.toFixed(0)} </div>
               </div>
               {/* )} */}
-              {isSubmitted && tdeeCalc !== 0 && (
-                <div className="result-row">
-                  <div className="result-label">
-                    TDEE (Calculated with logged calories and weight):
-                  </div>
-                  <div className="result-value"></div>
-                </div>
-              )}
             </>
           ) : null}
           {selectedFilter === 'ALL' || selectedFilter === 'LBM' ? (
@@ -743,191 +812,6 @@ const Progress = () => {
       </div>
     </main>
   )
-  // return (
-  //   <main className="users-page">
-  //     <h1>FitMatrix</h1>
-  //     <div className="users-container">
-  //     <div className="button-container">
-  //         <button onClick={toggleUnit}>
-  //           Switch to {unit === 'metric' ? 'Imperial' : 'Metric'}
-  //         </button>
-  //       </div>
-
-  // <form onSubmit={handleFormSubmit}>
-  //   {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
-  //   <p className="form-input">
-  //     <label htmlFor="weight">{`Enter today's weight:`}</label>
-  //     <input
-  //       type="number"
-  //       className="form-control"
-  //       name="weight"
-  //       placeholder="Weight"
-  //       value={displayValue || ''}
-  //       required
-  //       onChange={handleInputChange}
-  //     />
-  //   </p>
-  //   <p className="form-input">
-  //     <label htmlFor="calories">
-  //       {`Enter today's total calories:`}
-  //       <span className="reminder">
-  //         Remember to measure RAW ingredients
-  //       </span>
-  //     </label>
-  //     <input
-  //       type="number"
-  //       name="calories"
-  //       placeholder="Calories"
-  //       value={calories || ''}
-  //       onChange={handleInputChange}
-  //     />
-  //   </p>
-  //   <p>
-  //     <input type="submit" value="Submit" />
-  //   </p>
-  // </form>
-  //       <div className={`calories-user-stats ${isSubmitted ? 'show' : ''}`}>
-  //         <div className="button-group">
-  //           <button onClick={() => setSelectedFilter('BF%')}>BF%</button>
-  //           <button onClick={() => setSelectedFilter('BMR')}>BMR</button>
-  //           <button onClick={() => setSelectedFilter('LBM')}>LBM</button>
-  //           <button onClick={() => setSelectedFilter('TDEE')}>TDEE</button>
-  //           <button onClick={() => setSelectedFilter('ALL')}>ALL</button>
-  //         </div>
-  //         {(selectedFilter === 'ALL' ||
-  //           selectedFilter === 'TDEE' ||
-  //           selectedFilter === 'BMR') && (
-  //           <div>All metabolic expenditures report in Kcal/day</div>
-  //         )}
-  //         {selectedFilter === 'ALL' || selectedFilter === 'BMR' ? (
-  //           <>
-  //             <div className="result-row">
-  //               <div className="result-label">BMR (Mifflin St. Jeor):</div>
-  //               <div className="result-value"> {bmrMifflin.toFixed(0)}</div>
-  //             </div>
-  //             {/* {bodyFatPercent > 0 && (
-  //           <div className="result-row">
-  //             <div className="result-label">BMR (Katch-McArdle):</div>
-  //             <div className="result-value">{bmrKatch.toFixed(0)}</div>
-  //           </div>
-  //         )} */}
-  //             <div className="result-row">
-  //               <div className="result-label">BMR (Katch-McArdle):</div>
-  //               <div className="result-value"> {bmrKatch.toFixed(0)} </div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">RMR (Cunningham):</div>
-  //               <div className="result-value"> {rmrCunningham.toFixed(0)} </div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">RMR (Mifflin St. Jeor):</div>
-  //               <div className="result-value"> {rmrMifflin.toFixed(0)} </div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">RMR (Katch-McArdle):</div>
-  //               <div className="result-value">{rmrKatch.toFixed(0)} </div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label"></div>
-  //               <div className="result-value"></div>
-  //             </div>
-  //           </>
-  //         ) : null}
-  //         {selectedFilter === 'ALL' || selectedFilter === 'TDEE' ? (
-  //           <>
-  //             <div className="result-row">
-  //               <div className="result-label">TDEE (Mifflin St. Jeor):</div>
-  //               <div className="result-value"> {tdeeMifflin.toFixed(0)}</div>
-  //             </div>
-  //             {/* {bodyFatPercent > 0 && ( */}
-  //             <div className="result-row">
-  //               <div className="result-label">TDEE (Katch-McArdle):</div>
-  //               <div className="result-value">{tdeeKatch.toFixed(0)} </div>
-  //             </div>
-  //             {/* )} */}
-
-  //             {isSubmitted && tdeeCalc !== 0 && (
-  //               <div className="result-row">
-  //                 <div className="result-label">
-  //                   TDEE (Calculated with logged calories and weight):
-  //                 </div>
-  //                 <div className="result-value"></div>
-  //               </div>
-  //             )}
-  //           </>
-  //         ) : null}
-  //         {selectedFilter === 'ALL' || selectedFilter === 'LBM' ? (
-  //           <>
-  //             <div className="result-row">
-  //               <div className="result-label">
-  //                 Lean Body Mass (calculated from Body Fat Percent):
-  //               </div>
-  //               <div className="result-value">{lbmCalc.toFixed(1)}</div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">Lean Body Mass (Boer):</div>
-  //               <div className="result-value">{lbmBoer.toFixed(1)}</div>
-  //             </div>
-  //             {/* <div className="result-row">
-  //               <div className="result-label">Lean Body Mass (James):</div>
-  //               <div className="result-value">{lbmJames.toFixed(1)}</div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">Lean Body Mass (Hume):</div>
-  //               <div className="result-value">{lbmHume.toFixed(1)}</div>
-  //             </div> */}
-  //           </>
-  //         ) : null}
-  //         {selectedFilter === 'ALL' || selectedFilter === 'BF%' ? (
-  //           <>
-  //             {/* Body Fat Percentages */}
-  //             <div className="result-row">
-  //               <div className="result-label">Covert Bailey Method:</div>
-  //               <div className="result-value"> {covertBailey.toFixed(1)}%</div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">Navy Method:</div>
-  //               <div className="result-value"> {navyBfp.toFixed(1)}%</div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">YMCA Method:</div>
-  //               <div className="result-value"> {ymcaBfp.toFixed(1)}%</div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">Modified YMCA Method:</div>
-  //               <div className="result-value"> {modYmcaBfp.toFixed(1)}%</div>
-  //             </div>
-
-  //             <div className="result-row">
-  //               <div className="result-label">
-  //                 Heritage BMI to Body Fat Percentage Method:
-  //               </div>
-  //               <div className="result-value"> {bmiBfp.toFixed(1)}%</div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">Average Body Fat Percent:</div>
-  //               <div className="result-value"> {averageBfp.toFixed(1)}%</div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label">BMI:</div>
-  //               <div className="result-value"> {bmi.toFixed(1)}</div>
-  //             </div>
-  //             <div className="result-row">
-  //               <div className="result-label"></div>
-  //               <div className="result-value"></div>
-  //             </div>
-  //           </>
-  //         ) : null}
-  //         {isSubmitted && steps !== 0 && (
-  //           <div className="result-row">
-  //             <div className="result-label">Steps:</div>
-  //             <div className="result-value"></div>
-  //           </div>
-  //         )}
-  //       </div>
-  //     </div>
-  //   </main>
-  // )
 }
 
 export default Progress

@@ -68,6 +68,7 @@ export type GoalType = {
 }
 
 export type ProgressType = {
+  id?: number
   userId?: number
   dateOfEntry?: Date
   progressWeightImperial?: number
@@ -112,4 +113,22 @@ export const NullUserStats: StatsType = {
   weightImperial: 0,
   heightMetric: 0,
   weightMetric: 0,
+}
+
+export type InteractionType = 'weight' | 'rate' | 'date' | null
+
+export type InteractionData = {
+  goalDate: Date | null
+  goalRate: number | null
+  goalWeight: number | null
+  lastInteraction: InteractionType
+  previousInteraction: InteractionType
+}
+
+export const interactionData: InteractionData = {
+  goalDate: null,
+  goalRate: null,
+  goalWeight: null,
+  lastInteraction: null,
+  previousInteraction: null,
 }
