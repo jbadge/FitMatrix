@@ -70,7 +70,7 @@ export type GoalType = {
 export type ProgressType = {
   id?: number
   userId?: number
-  dateOfEntry?: Date
+  doE?: Date
   progressWeightImperial?: number
   progressWeightMetric?: number
   calories?: number

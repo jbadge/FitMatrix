@@ -13,6 +13,7 @@ import UserStats from './pages/UserPage'
 import UserInfo from './pages/UserInfo'
 import Progress from './pages/Progress'
 import SignedOutTdee from './pages/SignedOutTdee'
+import SignedInHomePage from './pages/SignedInHomePage'
 
 export function App() {
   return (
@@ -21,10 +22,15 @@ export function App() {
 
       <Routes>
         {/* NEED INFO BACK IN THERE BUT WANTED DEFAULT TO NPE */}
-        <Route path="/" element={<SignedOutTdee />} />
+
+        <Route
+          path="/"
+          element={isLoggedIn() ? <SignedInHomePage /> : <SignedOutTdee />}
+        />
         <Route path="/users/:id" element={<UserStats />} />
         <Route path="/users/:id/info" element={<UserInfo />} />
         <Route path="/users/:id/Progress" element={<Progress />} />
+        {/* <Route path="/users/:id/Progress/:id" element={<Progress />} /> */}
         {/* <Route path="/new" element={<NewProgressEntry />} /> */}
 
         <Route path="/signup" element={<SignUp />} />

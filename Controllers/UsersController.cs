@@ -7,6 +7,7 @@ using System.Linq;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Npgsql.Internal.TypeHandlers.NetworkHandlers;
 
 namespace FitMatrix.Controllers
 {
@@ -182,42 +183,67 @@ namespace FitMatrix.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Goal>> CreateGoalForUser(int userId, Goal goal)
         {
-            // goal.UserId = GetCurrentUserId();
+
             var user = await _context.Users.FindAsync(userId);
+
             if (user == null)
             {
                 return NotFound();
             }
+
             _context.Goals.Add(goal);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGoal", new { id = goal.Id }, goal);
         }
 
-        // GET: api/Users/5/Progress
-        //
-        // Fetches and returns a specific user by finding it by id. The id is specified in the
-        // URL. In the sample URL above it is the `5`.  The "{id}" in the [HttpGet("{id}")] is what tells dotnet
-        // to grab the id from the URL. It is then made available to us as the `id` argument to the method.
-        //
-        // [HttpGet("{userId}/progress")]
-        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        // public async Task<ActionResult<User>> GetProgressFromUser(int id)
-        // {
-        //     // Find the user's progress in the database using `FindAsync` to look it up by id
-        //     // var user = await _context.Users.FindAsync(id);
-        //     var user = await _context.Users.Include(user => user.Stats).Include(user => user.Goal).Include(user => user.Progress).FirstOrDefaultAsync(x => x.Id == id);
+        // Updates progress to a user
+        // PUT: /api/Users/5/Progress/2
+        [HttpPut("{userId}/progress/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Progress>> CreateProgressForUser(int userId, int id, Progress progress)
+        {
 
-        //     // If we didn't find anything, we receive a `null` in return
-        //     if (user == null)
-        //     {
-        //         // Return a `404` response to the client indicating we could not find a user with this id
-        //         return NotFound();
-        //     }
+            if (id != progress.Id)
+            {
+                return BadRequest();
+            }
 
-        //     // Return the user as a JSON object.
-        //     return user;
-        // }
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _context.Entry(progress).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Ooops, looks like there was an error, so check to see if the record we were
+                // updating no longer exists.
+                if (!ProgressExists(id))
+                {
+                    // If the record we tried to update was already deleted by someone else,
+                    // return a `404` not found
+                    return NotFound();
+                }
+                else
+                {
+                    // Otherwise throw the error back, which will cause the request to fail
+                    // and generate an error to the client.
+                    throw;
+                }
+            }
+            // Return a copy of the updated data
+            // return CreatedAtAction("GetProgress", new { id = progress.Id }, progress);
+            return Ok(progress);
+        }
+
 
         // Add progress to a user
         // POST: /api/Users/5/Progress
@@ -225,21 +251,29 @@ namespace FitMatrix.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<Progress>> CreateProgressForUser(int userId, Progress progress)
         {
+
             var user = await _context.Users.FindAsync(userId);
 
             if (user == null)
             {
                 return NotFound();
             }
+
             _context.Progress.Add(progress);
             await _context.SaveChangesAsync();
             return CreatedAtAction("GetProgress", new { id = progress.Id }, progress);
         }
 
+
         // Private helper method that looks up an existing user by the supplied id
         private bool UserExists(int id)
         {
             return _context.Users.Any(user => user.Id == id);
+        }
+
+        private bool ProgressExists(int id)
+        {
+            return _context.Progress.Any(progress => progress.Id == id);
         }
 
         // Private helper method to get the JWT claim related to the user ID

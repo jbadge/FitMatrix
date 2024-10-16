@@ -1,12 +1,12 @@
 import React from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import { getUser, logout } from '../types/auth'
 import avatar from '../../images/avatar.png'
 
 const SignedInNav = () => {
   const user = getUser()
-  const { id } = useParams() as { id: string }
+  // const { id } = useParams() as { id: string }
 
   function handleLogout() {
     logout()
@@ -22,7 +22,7 @@ const SignedInNav = () => {
     <ul>
       <li>
         <nav className="navbar-container">
-          <a href={`users/${id}/Progress`}>
+          <a href={`/`}>
             <i className="fa fa-home"></i>
           </a>
           <div className="navbar">
