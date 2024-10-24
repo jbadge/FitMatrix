@@ -14,6 +14,7 @@ import UserInfo from './pages/UserInfo'
 import Progress from './pages/Progress'
 import SignedOutTdee from './pages/SignedOutTdee'
 import SignedInHomePage from './pages/SignedInHomePage'
+import Measurements from './pages/Measurements'
 
 export function App() {
   return (
@@ -32,7 +33,7 @@ export function App() {
         <Route path="/users/:id/Progress" element={<Progress />} />
         {/* <Route path="/users/:id/Progress/:id" element={<Progress />} /> */}
         {/* <Route path="/new" element={<NewProgressEntry />} /> */}
-
+        <Route path="/users/:id/Measurements" element={<Measurements />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
       </Routes>

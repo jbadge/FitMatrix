@@ -60,6 +60,26 @@ export function getUser() {
   return auth.user
 }
 
+export const getUserById = async (id?: string) => {
+  const auth = authFromStorage()
+
+  if (auth && auth.user && auth.user.id === Number(id)) {
+    const response = await fetch(`/api/Users/${id}`, {
+      headers: {
+        Authorization: authHeader(),
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const userData = await response.json()
+
+    return userData
+  }
+}
+
 // Removes the authentication data, effectively "forgetting" the
 // session information and logging the user out.
 export function logout() {

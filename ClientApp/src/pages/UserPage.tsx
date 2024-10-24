@@ -85,6 +85,10 @@ const UserPage = () => {
             {/* Need something for editing an old progress entry */}
             <Link to={`/users/${id}/Progress`}>Add a new progress entry</Link>
           </li>
+          <li>
+            {/* Need something for editing an old progress entry */}
+            <Link to={`/users/${id}/Measurements`}>Add new measurements</Link>
+          </li>
         </ul>
       </div>
     </main>

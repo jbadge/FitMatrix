@@ -18,6 +18,7 @@ const SignedInNav = () => {
             <i className="fa fa-plus"></i> Log Daily Values
           </Link> */
   }
+
   return (
     <ul>
       <li>

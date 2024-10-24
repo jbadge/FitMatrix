@@ -3,6 +3,7 @@ using System;
 using FitMatrix.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FitMatrix.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20241018010712_FixesMeasurementsClassProperties")]
+    partial class FixesMeasurementsClassProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,9 +89,6 @@ namespace FitMatrix.Migrations
 
                     b.Property<double>("ChestMetric")
                         .HasColumnType("double precision");
-
-                    b.Property<DateTime>("DoE")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<double>("HipsImperial")
                         .HasColumnType("double precision");
@@ -324,7 +324,7 @@ namespace FitMatrix.Migrations
             modelBuilder.Entity("FitMatrix.Models.Measurements", b =>
                 {
                     b.HasOne("FitMatrix.Models.User", "User")
-                        .WithMany("Measurements")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -357,8 +357,6 @@ namespace FitMatrix.Migrations
             modelBuilder.Entity("FitMatrix.Models.User", b =>
                 {
                     b.Navigation("Goal");
-
-                    b.Navigation("Measurements");
 
                     b.Navigation("Progress");
 

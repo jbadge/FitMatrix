@@ -39,7 +39,7 @@ namespace FitMatrix.Controllers
         {
             // Find the user in the database using `FindAsync` to look it up by id
             // var user = await _context.Users.FindAsync(id);
-            var user = await _context.Users.Include(user => user.Stats).Include(user => user.Goal).Include(user => user.Progress).FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _context.Users.Include(user => user.Stats).Include(user => user.Goal).Include(user => user.Progress).Include(user => user.Measurements).FirstOrDefaultAsync(x => x.Id == id);
 
             // If we didn't find anything, we receive a `null` in return
             if (user == null)
@@ -158,6 +158,53 @@ namespace FitMatrix.Controllers
             return CreatedAtAction("GetStats", new { id = stats.Id }, stats);
         }
 
+        // Updates measurements to a user
+        // PUT: /api/Users/5/Measurements/2
+        [HttpPut("{userId}/measurements/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<Progress>> CreateMeasurementsForUser(int userId, int id, Measurements measurements)
+        {
+
+            if (id != measurements.Id)
+            {
+                return BadRequest();
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _context.Entry(measurements).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Ooops, looks like there was an error, so check to see if the record we were
+                // updating no longer exists.
+                if (!MeasurementsExists(id))
+                {
+                    // If the record we tried to update was already deleted by someone else,
+                    // return a `404` not found
+                    return NotFound();
+                }
+                else
+                {
+                    // Otherwise throw the error back, which will cause the request to fail
+                    // and generate an error to the client.
+                    throw;
+                }
+            }
+            // Return a copy of the updated data
+            // return CreatedAtAction("GetMeasurements", new { id = measurements.Id }, measurements);
+            return Ok(measurements);
+        }
+
         // Add measurements to a user
         // POST: /api/Users/5/Measurements
         [HttpPost("{userId}/measurements")]
@@ -274,6 +321,11 @@ namespace FitMatrix.Controllers
         private bool ProgressExists(int id)
         {
             return _context.Progress.Any(progress => progress.Id == id);
+        }
+
+        private bool MeasurementsExists(int id)
+        {
+            return _context.Measurements.Any(measurements => measurements.Id == id);
         }
 
         // Private helper method to get the JWT claim related to the user ID

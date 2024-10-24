@@ -26,18 +26,21 @@ export type NewUserType = {
   stats: [] | undefined
   goal: [] | undefined
   progress: [] | undefined
+  measurements: [] | undefined
 }
 
 export type UserType = {
   id?: number
   fullName: string
   email: string
-  stats: [] | undefined
+  stats: StatsType[] | undefined
   goal: [] | undefined
   progress: [] | undefined
+  measurements: [] | undefined
 }
 
 export type StatsType = {
+  id?: number
   userId?: number
   age: number
   doB?: Date
@@ -52,6 +55,7 @@ export type StatsType = {
 }
 
 export type GoalType = {
+  id?: number
   userId?: number
   goalSelection?: GoalOptionsType
   goalWeightLoseImperial?: number
@@ -77,6 +81,48 @@ export type ProgressType = {
   bodyFatPercent?: number
 }
 
+export type MeasurementsType = {
+  id?: number
+  userId?: number
+  doE?: Date
+  waistMetric: number
+  waistImperial: number
+  navelMetric?: number
+  navelImperial?: number
+  neckMetric: number
+  neckImperial: number
+  hipsMetric: number
+  hipsImperial: number
+  chestMetric?: number
+  chestImperial?: number
+  shouldersMetric?: number
+  shouldersImperial?: number
+  rightBicepMetric?: number
+  rightBicepImperial?: number
+  leftBicepMetric?: number
+  leftBicepImperial?: number
+  rightForearmMetric: number
+  rightForearmImperial: number
+  leftForearmMetric?: number
+  leftForearmImperial?: number
+  rightWristMetric: number
+  rightWristImperial: number
+  leftWristMetric?: number
+  leftWristImperial?: number
+  rightThighMetric: number
+  rightThighImperial: number
+  leftThighMetric?: number
+  leftThighImperial?: number
+  rightCalfMetric: number
+  rightCalfImperial: number
+  leftCalfMetric?: number
+  leftCalfImperial?: number
+  rightAnkleMetric?: number
+  rightAnkleImperial?: number
+  leftAnkleMetric?: number
+  leftAnkleImperial?: number
+}
+
 export type LoginUserType = {
   email: string
   password: string
@@ -89,6 +135,7 @@ export type LoggedInUser = {
   stats: StatsType[] | undefined
   goal: GoalType[] | undefined
   progress: ProgressType[] | undefined
+  measurements: MeasurementsType[] | undefined
 }
 
 export type LoginSuccess = {
@@ -103,6 +150,7 @@ export const NullUser: UserType = {
   stats: undefined,
   goal: undefined,
   progress: undefined,
+  measurements: undefined,
 }
 
 export const NullUserStats: StatsType = {

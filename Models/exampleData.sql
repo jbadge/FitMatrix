@@ -3,13 +3,15 @@ TRUNCATE TABLE "Measurements", "Stats", "Goals", "Progress", "Users" RESTART IDE
 
 -- Ensure we have a user to associate to the stats below
 INSERT INTO "Users" ("FullName", "Email", "HashedPassword") VALUES ('Jeremy Badger', 'badger@suncoast.io', 'AQAAAAIAAYagAAAAECQCQXCdJ+klkUJrmKa+TC+snEorioNo61ZLi7m9OJ0q7h/91NvCVC4jpn7/ill29A==');
-INSERT INTO "Users" ("FullName", "Email", "HashedPassword") VALUES ('Sarah', 'badger2@suncoast.io', 'xxxxx');
-INSERT INTO "Users" ("FullName", "Email", "HashedPassword") VALUES ('Mary', 'badger3@suncoast.io', 'xxxxx');
+INSERT INTO "Users" ("FullName", "Email", "HashedPassword") VALUES ('Sarah', 'badger2@suncoast.io', 'AQAAAAIAAYagAAAAECQCQXCdJ+klkUJrmKa+TC+snEorioNo61ZLi7m9OJ0q7h/91NvCVC4jpn7/ill29A==');
+INSERT INTO "Users" ("FullName", "Email", "HashedPassword") VALUES ('Mary', 'badger3@suncoast.io', 'AQAAAAIAAYagAAAAECQCQXCdJ+klkUJrmKa+TC+snEorioNo61ZLi7m9OJ0q7h/91NvCVC4jpn7/ill29A==');
 
 INSERT INTO "Stats" ("UserId", "Age", "DoB", "Sex", "HeightImperial", "HeightMetric", "WeightImperial", "WeightMetric", "ActivityLevel", "ActivityLevelLabel", "BodyFatPercent") VALUES (1, 48, '1976-03-03 00:00:00-08', 'M', 72, 182.88000000073154, 197.2, 83.46099608, 1.425, 'Light', 16);
       
 
 INSERT INTO "Goals" ("UserId", "GoalSelection", "GoalWeightLoseImperial", "GoalRateLoseImperial", "GoalWeightGainImperial", "GoalRateGainImperial", "GoalWeightLoseMetric", "GoalRateLoseMetric", "GoalWeightGainMetric", "GoalRateGainMetric", "GoalDate", "GoalBodyFatPercent") VALUES (1, 'lose', 176, 2, 192, 2, 79.83225712000001, 0.90718474, 87.08973504000001, 0.90718474, '2024-11-04 11:28:18-08', 0);
+
+INSERT INTO "Measurements" ("UserId", "DoE", "WaistMetric", "WaistImperial", "NavelMetric", "NavelImperial", "NeckMetric", "NeckImperial", "HipsMetric", "HipsImperial", "ChestMetric", "ChestImperial", "ShouldersMetric", "ShouldersImperial", "RightBicepMetric", "RightBicepImperial", "LeftBicepMetric", "LeftBicepImperial", "RightForearmMetric", "RightForearmImperial", "LeftForearmMetric", "LeftForearmImperial", "RightWristMetric", "RightWristImperial", "LeftWristMetric", "LeftWristImperial", "RightThighMetric", "RightThighImperial", "LeftThighMetric", "LeftThighImperial", "RightCalfMetric", "RightCalfImperial", "LeftCalfMetric", "LeftCalfImperial", "RightAnkleMetric", "RightAnkleImperial", "LeftAnkleMetric", "LeftAnkleImperial") VALUES (1, '2024-08-04 12:00:00-07', 94, 37, 0, 0, 36.8, 14.5, 99.1, 39.0, 0, 0, 0, 0, 0, 0, 0, 0, 29.5, 11.625, 0, 0, 16.8, 6.625, 0, 0, 63.5, 25.0, 0, 0, 38.1, 15.0, 0, 0, 0, 0, 0, 0);
 
 INSERT INTO "Progress" ("UserId", "ProgressWeightImperial", "ProgressWeightMetric", "Calories", "DoE", "BodyFatPercent") VALUES (1, 196.9, 89.312338, 1766, '2024-08-04 12:00:00-07', 0);
 INSERT INTO "Progress" ("UserId", "ProgressWeightImperial", "ProgressWeightMetric", "Calories", "DoE", "BodyFatPercent") VALUES (1, 198.0, 89.811289, 1264, '2024-08-05 12:00:00-07', 0);

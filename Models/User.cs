@@ -21,6 +21,7 @@ namespace FitMatrix.Models
         public List<Stats> Stats { get; set; }
         public List<Goal> Goal { get; set; }
         public List<Progress> Progress { get; set; }
+        public List<Measurements> Measurements { get; set; }
 
         public string Password
         {

@@ -405,6 +405,12 @@ form {
   }
 }
 
+.graph-container {
+  display: flex;
+  justify-content: center;
+  // align-content: center;
+}
+
 ///////////////
 .progress-entry-date {
   cursor: pointer;

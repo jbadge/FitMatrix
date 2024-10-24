@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ProgressType, StatsType } from '../types/types'
+import { MeasurementsType, ProgressType, StatsType } from '../types/types'
 import { authHeader, getUser } from '../types/auth'
+import HistoryAreaGraph from '../components/HistoryAreaGraph'
 
 const SignedInHomePage = () => {
+  const id = getUser().id
+
   const [unit, setUnit] = useState('imperial')
   const [selectedFilter, setSelectedFilter] = useState('TDEE')
 
@@ -50,22 +53,30 @@ const SignedInHomePage = () => {
     bodyFatPercent: 0,
   })
 
+  // Measurements
+  const [measurementsInfo, setMeasurementsInfo] = useState<MeasurementsType>({
+    userId: 0,
+    waistMetric: 0,
+    waistImperial: 0,
+    neckMetric: 0,
+    neckImperial: 0,
+    hipsMetric: 0,
+    hipsImperial: 0,
+    rightForearmMetric: 0,
+    rightForearmImperial: 0,
+    rightWristMetric: 0,
+    rightWristImperial: 0,
+    rightThighMetric: 0,
+    rightThighImperial: 0,
+    rightCalfMetric: 0,
+    rightCalfImperial: 0,
+  })
+
   // Stats
   const [tdeeCalc, setTdeeCalc] = useState(0)
   // Steps is brought in from device?
   const steps = 0
 
-  // Measurements
-  /////////////////////////////////////////////////
-  // Need to record these measurements for the user
-  const waist = 37
-  const neck = 14.5
-  const hips = 39
-  const forearm = 11.625
-  const wrist = 6.625
-  const thigh = 25
-  const calf = 15
-  /////////////////////////////////////////////////
   const convertWeightToImperial = (kg: number) => kg / 0.45359237
 
   const toggleUnit = () => {
@@ -89,7 +100,7 @@ const SignedInHomePage = () => {
           703
         : progressWeightMetric! / Math.pow(statsInfo.heightMetric / 100, 2)
     setBmi(bmi)
-    console.log(bmi)
+    // console.log(bmi)
 
     /////////////////////////
     // Body Fat Percentage //
@@ -101,23 +112,40 @@ const SignedInHomePage = () => {
       unit === 'imperial'
         ? // Imperial formula
           sex === 'M'
-          ? 86.01 * Math.log10(waist - neck) -
+          ? 86.01 *
+              Math.log10(
+                measurementsInfo.waistImperial - measurementsInfo.neckImperial
+              ) -
             70.041 * Math.log10(statsInfo.heightImperial) +
             36.76
-          : 163.205 * Math.log10(waist + hips - neck) -
+          : 163.205 *
+              Math.log10(
+                measurementsInfo.waistImperial +
+                  measurementsInfo.hipsImperial -
+                  measurementsInfo.neckImperial
+              ) -
             97.684 * Math.log10(statsInfo.heightImperial) -
             78.387
         : // Metric
           sex === 'M'
           ? 495 /
               (1.0324 -
-                0.19077 * Math.log10(waist * 2.54 - neck * 2.54) +
+                0.19077 *
+                  Math.log10(
+                    measurementsInfo.waistImperial * 2.54 -
+                      measurementsInfo.neckImperial * 2.54
+                  ) +
                 0.15456 * Math.log10(statsInfo.heightMetric)) -
             450
           : // female calc off?
             495 /
               (1.29579 -
-                0.35004 * Math.log10(waist * 2.54 + hips * 2.54 - neck * 2.54) +
+                0.35004 *
+                  Math.log10(
+                    measurementsInfo.waistImperial * 2.54 +
+                      measurementsInfo.hipsImperial * 2.54 -
+                      measurementsInfo.neckImperial * 2.54
+                  ) +
                 0.221 * Math.log10(statsInfo.heightMetric)) -
             450
     // Covert Bailey Formula
@@ -125,11 +153,23 @@ const SignedInHomePage = () => {
     const covertBaileyCalc =
       sex === 'M'
         ? age < 30
-          ? waist + 0.5 * hips - 3 * forearm - wrist
-          : waist + 0.5 * hips - 2.7 * forearm - wrist
+          ? measurementsInfo.waistImperial +
+            0.5 * measurementsInfo.hipsImperial -
+            3 * measurementsInfo.rightForearmImperial -
+            measurementsInfo.rightWristImperial
+          : measurementsInfo.waistImperial +
+            0.5 * measurementsInfo.hipsImperial -
+            2.7 * measurementsInfo.rightForearmImperial -
+            measurementsInfo.rightWristImperial
         : age < 30
-          ? hips + 0.8 * thigh - 2 * calf - wrist
-          : hips + thigh - 2 * calf - wrist
+          ? measurementsInfo.hipsImperial +
+            0.8 * measurementsInfo.rightThighImperial -
+            2 * measurementsInfo.rightCalfImperial -
+            measurementsInfo.rightWristImperial
+          : measurementsInfo.hipsImperial +
+            measurementsInfo.rightThighImperial -
+            2 * measurementsInfo.rightCalfImperial -
+            measurementsInfo.rightWristImperial
 
     // Heritage BMI to Body Fat Percentage Formula
     // may be off (or bmi may be off)? It is off from the hub pages persons report
@@ -144,24 +184,30 @@ const SignedInHomePage = () => {
     // YMCA Body Fat Percentage Formula
     const ymcaBfpCalc =
       sex === 'M'
-        ? ((4.15 * waist - 0.082 * progressWeightImperial! - 98.42) /
+        ? ((4.15 * measurementsInfo.waistImperial -
+            0.082 * progressWeightImperial! -
+            98.42) /
             progressWeightImperial!) *
           100
-        : ((4.15 * waist - 0.082 * progressWeightImperial! - 76.76) /
+        : ((4.15 * measurementsInfo.waistImperial -
+            0.082 * progressWeightImperial! -
+            76.76) /
             progressWeightImperial!) *
           100
 
     // Modified YMCA Body Fat Percentage Formula
     const modYmcaBfpCalc =
       sex === 'M'
-        ? ((-0.082 * progressWeightImperial! + 4.15 * waist - 94.42) /
+        ? ((-0.082 * progressWeightImperial! +
+            4.15 * measurementsInfo.waistImperial -
+            94.42) /
             progressWeightImperial!) *
           100
         : ((0.268 * progressWeightImperial! -
-            0.318 * wrist +
-            0.157 * waist +
-            0.245 * hips -
-            0.434 * forearm -
+            0.318 * measurementsInfo.rightWristImperial +
+            0.157 * measurementsInfo.waistImperial +
+            0.245 * measurementsInfo.hipsImperial -
+            0.434 * measurementsInfo.rightForearmImperial -
             8.987) /
             progressWeightImperial!) *
           100
@@ -273,7 +319,7 @@ const SignedInHomePage = () => {
           161
 
     // Katch-McArdle Formula
-    console.log(progressWeightImperial, progressWeightMetric, selectedBfp)
+    // console.log(progressWeightImperial, progressWeightMetric, selectedBfp)
     const bmrKatchCalc =
       370 + 21.6 * (progressWeightMetric! * (1 - selectedBfp / 100))
 
@@ -330,8 +376,10 @@ const SignedInHomePage = () => {
           return new Date(a.doE!).getTime() - new Date(b.doE!).getTime()
         })
 
+        // console.log(user)
         const progressEntry = sortedProgressEntryArray.slice(-1)
         const stats = user.stats?.slice(-1)[0]
+        const measurements = user.measurements?.slice(-1)[0]
         setProgress(progressEntry[0] || {})
 
         calculateResults(progressEntry[0] || {})
@@ -346,6 +394,10 @@ const SignedInHomePage = () => {
           setSex(stats.sex || '')
           setBodyFatPercent(stats.bodyFatPercent || '')
           startingWeightRef.current = stats.weightImperial
+        }
+
+        if (measurements) {
+          setMeasurementsInfo({ ...measurements, userId: user.id })
         }
       } catch (error) {
         console.error('Error fetching user data:', error)
@@ -458,7 +510,7 @@ const SignedInHomePage = () => {
   useEffect(() => {
     if (statsInfo.heightImperial !== 0) {
       calculateResults(progress)
-      console.log(statsInfo)
+      // console.log(statsInfo)
     }
   }, [unit, statsInfo, progress])
 
@@ -663,6 +715,10 @@ const SignedInHomePage = () => {
               <div className="result-value"></div>
             </div>
           )}
+          {/* Maybe only show if more than 7 entries? or 1? */}
+          <div className="graph-container">
+            <HistoryAreaGraph id={id} unit={unit} />
+          </div>
         </div>
       </div>
     </main>

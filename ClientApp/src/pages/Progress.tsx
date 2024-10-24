@@ -10,7 +10,6 @@ import { getMonth, getYear } from 'date-fns'
 
 async function submitProgress(entry: ProgressType) {
   const id = entry.userId
-  console.log('id: ', entry.id)
 
   const response = await fetch(`/api/Users/${id}/Progress`, {
     method: 'POST',
@@ -61,6 +60,7 @@ const Progress = () => {
   const [errorMessage, setErrorMessage] = React.useState('')
 
   const [unit, setUnit] = useState('imperial')
+  const [weight, setWeight] = useState(0)
   const [calories, setCalories] = useState(0)
 
   const [progress, setProgress] = useState<ProgressType>({
@@ -70,8 +70,6 @@ const Progress = () => {
     calories: 0,
     bodyFatPercent: 0,
   })
-
-  const [weight, setWeight] = useState(0)
 
   const [dateOfEntry, setDateOfEntry] = useState(new Date())
   const [progressEntries, setProgressEntries] = useState<ProgressType[]>([])
@@ -95,6 +93,38 @@ const Progress = () => {
   const convertWeightToImperial = (kg: number) => kg / 0.45359237
   const convertWeightToMetric = (lbs: number) => lbs * 0.45359237
 
+  const displayWeightValue =
+    unit === 'imperial'
+      ? Math.round(weight * 100) / 100
+      : Math.round(weight * 100) / 100
+
+  const toggleUnit = () => {
+    setUnit((prevUnit) => {
+      const newUnit = prevUnit === 'metric' ? 'imperial' : 'metric'
+
+      setProgress((prevInput) => {
+        const newWeightMetric =
+          newUnit === 'metric'
+            ? prevInput.progressWeightMetric!
+            : convertWeightToMetric(prevInput.progressWeightImperial!)
+        const newWeightImperial =
+          newUnit === 'imperial'
+            ? prevInput.progressWeightImperial!
+            : convertWeightToImperial(prevInput.progressWeightMetric!)
+        const date = new Date()
+        setWeight(newUnit === 'metric' ? newWeightMetric : newWeightImperial)
+
+        return {
+          dateOfEntry: date,
+          progressWeightMetric: newWeightMetric,
+          progressWeightImperial: newWeightImperial,
+          calories: calories,
+        }
+      })
+      return newUnit
+    })
+  }
+
   const createProgressMutation = useMutation(
     (progress: ProgressType) => submitProgress(progress),
     {
@@ -107,11 +137,6 @@ const Progress = () => {
       },
     }
   )
-
-  const displayWeightValue =
-    unit === 'imperial'
-      ? Math.round(weight * 100) / 100
-      : Math.round(weight * 100) / 100
 
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -183,33 +208,6 @@ const Progress = () => {
         calories: value,
       }))
     }
-  }
-
-  const toggleUnit = () => {
-    setUnit((prevUnit) => {
-      const newUnit = prevUnit === 'metric' ? 'imperial' : 'metric'
-
-      setProgress((prevInput) => {
-        const newWeightMetric =
-          newUnit === 'metric'
-            ? prevInput.progressWeightMetric!
-            : convertWeightToMetric(prevInput.progressWeightImperial!)
-        const newWeightImperial =
-          newUnit === 'imperial'
-            ? prevInput.progressWeightImperial!
-            : convertWeightToImperial(prevInput.progressWeightMetric!)
-        const date = new Date()
-        setWeight(newUnit === 'metric' ? newWeightMetric : newWeightImperial)
-
-        return {
-          dateOfEntry: date,
-          progressWeightMetric: newWeightMetric,
-          progressWeightImperial: newWeightImperial,
-          calories: calories,
-        }
-      })
-      return newUnit
-    })
   }
 
   useEffect(() => {

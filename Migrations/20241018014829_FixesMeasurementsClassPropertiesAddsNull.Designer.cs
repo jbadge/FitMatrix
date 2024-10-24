@@ -3,6 +3,7 @@ using System;
 using FitMatrix.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FitMatrix.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20241018014829_FixesMeasurementsClassPropertiesAddsNull")]
+    partial class FixesMeasurementsClassPropertiesAddsNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,14 +84,11 @@ namespace FitMatrix.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("ChestImperial")
+                    b.Property<double?>("ChestImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("ChestMetric")
+                    b.Property<double?>("ChestMetric")
                         .HasColumnType("double precision");
-
-                    b.Property<DateTime>("DoE")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<double>("HipsImperial")
                         .HasColumnType("double precision");
@@ -96,46 +96,46 @@ namespace FitMatrix.Migrations
                     b.Property<double>("HipsMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftAnkleImperial")
+                    b.Property<double?>("LeftAnkleImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftAnkleMetric")
+                    b.Property<double?>("LeftAnkleMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftBicepImperial")
+                    b.Property<double?>("LeftBicepImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftBicepMetric")
+                    b.Property<double?>("LeftBicepMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftCalfImperial")
+                    b.Property<double?>("LeftCalfImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftCalfMetric")
+                    b.Property<double?>("LeftCalfMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftForearmImperial")
+                    b.Property<double?>("LeftForearmImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftForearmMetric")
+                    b.Property<double?>("LeftForearmMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftThighImperial")
+                    b.Property<double?>("LeftThighImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftThighMetric")
+                    b.Property<double?>("LeftThighMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftWristImperial")
+                    b.Property<double?>("LeftWristImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("LeftWristMetric")
+                    b.Property<double?>("LeftWristMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("NavelImperial")
+                    b.Property<double?>("NavelImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("NavelMetric")
+                    b.Property<double?>("NavelMetric")
                         .HasColumnType("double precision");
 
                     b.Property<double>("NeckImperial")
@@ -144,16 +144,16 @@ namespace FitMatrix.Migrations
                     b.Property<double>("NeckMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("RightAnkleImperial")
+                    b.Property<double?>("RightAnkleImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("RightAnkleMetric")
+                    b.Property<double?>("RightAnkleMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("RightBicepImperial")
+                    b.Property<double?>("RightBicepImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("RightBicepMetric")
+                    b.Property<double?>("RightBicepMetric")
                         .HasColumnType("double precision");
 
                     b.Property<double>("RightCalfImperial")
@@ -180,10 +180,10 @@ namespace FitMatrix.Migrations
                     b.Property<double>("RightWristMetric")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("ShouldersImperial")
+                    b.Property<double?>("ShouldersImperial")
                         .HasColumnType("double precision");
 
-                    b.Property<double>("ShouldersMetric")
+                    b.Property<double?>("ShouldersMetric")
                         .HasColumnType("double precision");
 
                     b.Property<int>("UserId")
