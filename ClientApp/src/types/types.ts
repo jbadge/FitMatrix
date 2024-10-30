@@ -34,9 +34,9 @@ export type UserType = {
   fullName: string
   email: string
   stats: StatsType[] | undefined
-  goal: [] | undefined
-  progress: [] | undefined
-  measurements: [] | undefined
+  goal: GoalType[] | undefined
+  progress: ProgressType[] | undefined
+  measurements: MeasurementsType[] | undefined
 }
 
 export type StatsType = {

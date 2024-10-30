@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useMutation } from 'react-query'
 import { authHeader } from '../types/auth'
+// Context
+import { useUserContext } from '../context/UserContext'
 
 import {
   APIError,
@@ -14,7 +16,6 @@ import {
 } from '../types/types'
 import 'react-datepicker/dist/react-datepicker.css'
 import DatePicker from 'react-datepicker'
-import useLoadUser from '../hooks/useLoadUser'
 
 async function submitStats(entry: StatsType) {
   const id = entry.userId
@@ -55,10 +56,12 @@ async function submitGoal(entry: GoalType) {
 }
 
 const UserInfo = () => {
+  const userContext = useUserContext()
+  console.log('Render User')
+  console.log(userContext.userState)
+
   const navigate = useNavigate()
   const { id } = useParams() as { id: string }
-
-  const { user, isUserLoading } = useLoadUser(id)
 
   const [errorMessage, setErrorMessage] = useState('')
   const [focusedField, setFocusedField] = useState('')
@@ -1089,7 +1092,7 @@ const UserInfo = () => {
       delete stats.id
       setStatsInfo({
         ...stats,
-        userId: user.id,
+        userId: userContext.userState.id,
       })
       setAge(stats.age || 0)
       setDateOfBirth(stats.doB!)
@@ -1117,7 +1120,7 @@ const UserInfo = () => {
       delete goal.id
       setGoalInfo({
         ...goal,
-        userId: user.id,
+        userId: userContext.userState.id,
       })
       setCheckedGoals({
         lose: goal.goalSelection === 'lose',
@@ -1154,20 +1157,20 @@ const UserInfo = () => {
 
   // Load user information if data is in db
   useEffect(() => {
-    if (!user) return
+    if (!userContext.userState) return
 
     const stats =
-      user.stats && user.stats.length > 0
-        ? user.stats[user.stats.length - 1]
+      userContext.userState.stats && userContext.userState.stats.length > 0
+        ? userContext.userState.stats[userContext.userState.stats.length - 1]
         : undefined
     const goal =
-      user.goal && user.goal.length > 0
-        ? user.goal[user.goal.length - 1]
+      userContext.userState.goal && userContext.userState.goal.length > 0
+        ? userContext.userState.goal[userContext.userState.goal.length - 1]
         : undefined
 
-    handleStats(stats)
-    handleGoal(goal)
-  }, [user])
+    handleStats(stats!)
+    handleGoal(goal!)
+  }, [userContext.userState])
 
   // Handle mouse clicks outside Age, Month, Day, Year, DoB date
   useEffect(() => {
@@ -1208,10 +1211,6 @@ const UserInfo = () => {
         rateInput.reportValidity()
       }
     }
-  }
-
-  if (isUserLoading) {
-    return <div>Loading...</div>
   }
 
   return (

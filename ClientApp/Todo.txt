@@ -1,5 +1,7 @@
 KEEPS RERENDERING?!
 
+why do measurements show loading values?
+
 1. need help making 0.5 steps in lose fat with max being 10%
 1. default goal Date to a week away. use this date for minimum
 
